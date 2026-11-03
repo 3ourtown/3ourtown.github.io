@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>이장님 관리실</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap">
+<style>
+:root{--paper:#fbf7ee;--ink:#2a2620;--muted:#6f675a;--line:#d9ccb2;--pine:#2f7a55;--alert:#c8503b}
+*{box-sizing:border-box}
+body{margin:0;background:#efe8d8;color:var(--ink);font-family:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+main{max-width:1000px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:8px 0 12px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+input{padding:9px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;width:100%;margin:4px 0}
+button{font:inherit;padding:8px 14px;border-radius:9px;border:1px solid var(--pine);background:var(--pine);color:#fff;cursor:pointer}
+button.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+button.warn{background:#fff;color:var(--alert);border-color:var(--alert)}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button.on{outline:3px solid #f2c94c}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.post{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.post img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;background:#ddd}
+.post .m{padding:8px 10px;font-size:13px;display:flex;flex-direction:column;gap:4px}
+.post .row{display:flex;gap:6px;flex-wrap:wrap;padding:0 10px 10px}
+.hid{opacity:.45}
+.fine{color:var(--muted);font-size:13px}
+.fb{border-bottom:1px dashed var(--line);padding:8px 0;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>🏛️ 이장님 관리실 <span class="fine">(선생님용)</span></h1>
+<div class="card" id="login">
+  <p>Firebase에서 만든 <b>관리자 이메일 계정</b>으로 들어가요.</p>
+  <input id="em" type="email" placeholder="관리자 이메일" autocomplete="username">
+  <input id="pw" type="password" placeholder="비밀번호" autocomplete="current-password">
+  <button id="go">들어가기</button> <span class="fine" id="lmsg"></span>
+</div>
+<div id="app" hidden>
+  <div class="tabs"><button data-t="boast" class="on">자랑 게시판</button><button data-t="fb" class="ghost">선생님께 말하기</button><button class="ghost" id="clean">오래된 자랑 청소</button><button class="ghost" id="out">나가기</button></div>
+  <p class="fine" id="info"></p>
+  <div id="list"></div>
+</div>
+</main>
+<script src="firebase-config.js"></script>
+<script>
+(function(){
+const $=id=>document.getElementById(id),B="https://www.gstatic.com/firebasejs/10.12.2/",DAY=86400000;
+const PH={intro:"🏡 우리 마을 소개",pop50:"👨‍👩‍👧 주민 50명",pop100:"🎉 주민 100명",happy:"😊 행복 80",grade:"🏆 최고의 마을",museum:"🏛️ 박물관",folk:"🌉 민속마을",myeong:"🎎 명절 놀이",trans:"🐂 옛 탈것",bong:"🔥 봉수",fest:"🌏 세계 문화 축제",dino:"🦖 공룡 놀이공원",forest:"🌳 나무 심기",hall:"⭐ 마을회관",gold:"🏯 황금 마을회관",grad:"🎓 졸업"};
+const esc=t=>String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const load=s=>new Promise((r,j)=>{const e=document.createElement("script");e.src=s;e.onload=r;e.onerror=j;document.head.appendChild(e)});
+if(!window.FIREBASE_CONFIG){$("lmsg").textContent="firebase-config.js 에 설정값을 먼저 넣어 주세요.";$("go").disabled=true;return}
+let db,tab="boast";
+load(B+"firebase-app-compat.js").then(()=>Promise.all([load(B+"firebase-auth-compat.js"),load(B+"firebase-firestore-compat.js")])).then(()=>{
+  firebase.initializeApp(window.FIREBASE_CONFIG);db=firebase.firestore();
+  firebase.auth().onAuthStateChanged(u=>{if(u&&!u.isAnonymous){$("login").hidden=true;$("app").hidden=false;show()}else{$("login").hidden=false;$("app").hidden=true}});
+});
+$("go").onclick=async()=>{$("lmsg").textContent="확인 중…";try{await firebase.auth().signInWithEmailAndPassword($("em").value.trim(),$("pw").value);$("lmsg").textContent=""}catch(e){$("lmsg").textContent="들어가지 못했어요: "+(e.code||e.message)}};
+$("out").onclick=()=>firebase.auth().signOut();
+document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll("[data-t]").forEach(x=>{x.className=x===b?"on":"ghost"});show()});
+async function show(){$("list").innerHTML='<p class="fine">불러오는 중…</p>';
+  try{if(tab==="boast"){const q=await db.collection("boast").orderBy("at","desc").limit(200).get();const now=Date.now();
+      $("info").textContent="자랑 "+q.size+"개 (7일이 지나면 게임에서 안 보이고, 14일이 지나면 지워져요)";
+      $("list").innerHTML='<div class="grid">'+q.docs.map(d=>{const p=d.data(),age=Math.floor((now-p.at)/DAY);return '<div class="post'+(p.hidden?" hid":"")+'"><img src="'+p.img+'" alt=""><div class="m"><b>'+esc(p.school)+' '+esc(p.year)+'학년 · '+esc(p.nick)+'</b><span>'+(p.texts||[]).map(t=>PH[t]||t).join(" · ")+'</span><span class="fine">'+age+'일 전'+(p.hidden?" · 숨김":"")+'</span></div><div class="row"><button class="ghost" data-h="'+d.id+'" data-v="'+(p.hidden?0:1)+'">'+(p.hidden?"다시 보이기":"숨기기")+'</button><button class="warn" data-d="'+d.id+'">지우기</button></div></div>'}).join("")+'</div>';
+      $("list").querySelectorAll("[data-h]").forEach(b=>b.onclick=async()=>{await db.collection("boast").doc(b.dataset.h).update({hidden:b.dataset.v==="1"});show()});
+      $("list").querySelectorAll("[data-d]").forEach(b=>b.onclick=async()=>{if(!confirm("이 자랑을 지울까요?"))return;await db.collection("boast").doc(b.dataset.d).delete();show()})}
+    else{const q=await db.collection("feedback").limit(300).get();$("info").textContent="받은 이야기 "+q.size+"개";
+      const rows=q.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.at||0)-(a.at||0));
+      $("list").innerHTML='<div class="card">'+(rows.map(r=>'<div class="fb"><b>'+(r.cat?'['+esc(r.cat)+'] ':'')+esc(r.who||"이장님")+'</b> <span class="fine">'+esc(r.month||'')+' · Lv '+esc(r.lv||'')+'</span> <span class="fine">'+(r.at?new Date(r.at).toLocaleString("ko-KR"):"")+'</span><div>'+esc(r.text||r.msg||JSON.stringify(r))+'</div><button class="warn" data-d="'+r.id+'" style="margin-top:4px;padding:4px 10px">지우기</button></div>').join("")||'<p class="fine">아직 없어요.</p>')+'</div>';
+      $("list").querySelectorAll("[data-d]").forEach(b=>b.onclick=async()=>{await db.collection("feedback").doc(b.dataset.d).delete();show()})}}
+  catch(e){$("list").innerHTML='<p class="fine">불러오지 못했어요. 보안 규칙의 ADMIN_EMAIL이 이 계정 이메일과 같은지 확인해 주세요. ('+esc(e.code||e.message)+')</p>'}}
+$("clean").onclick=async()=>{if(!confirm("14일이 지난 자랑과 응원을 지울까요?"))return;const cut=Date.now()-14*DAY;let n=0;
+  for(const c of ["boast","cheers"]){const q=await db.collection(c).where("at","<",cut).limit(400).get();for(const d of q.docs){await d.ref.delete();n++}}alert(n+"개를 지웠어요");show()};
+})();
+</script>
+</body>
+</html>
