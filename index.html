@@ -471,6 +471,7 @@ const WISHES=[
 const NOTES=[
   {id:"paddy",t:"논농사",d:"옛날에는 사람과 소가 함께 논을 갈고 모를 심어, 가을에 한 번 벼를 거두었어요."},
   {id:"aigreen",t:"스마트팜",d:"인공지능과 센서가 온도·물·빛을 맞춰 주는 농장이에요. 날씨와 상관없이 1년 내내 채소를 길러요."},
+  {id:"firesafe",t:"소방서의 범위",d:"불이 나면 소방차가 빨리 도착해야 해요. 그래서 소방서는 마을 여러 곳에서 가까운 곳에 있어야 해요."},
   {id:"farm",t:"농사의 변화",d:"과학 기술이 발달하면서 사람과 소가 하던 농사가 기계와 인공지능을 쓰는 농사로 바뀌었어요."},
   {id:"post",t:"우체국",d:"편지와 소포를 보내고 받는 곳이에요. 옛날 파발과 서찰이 하던 일을 오늘날에는 우편과 택배가 해요."},
   {id:"comm",t:"통신수단의 변화",d:"옛날에는 봉수, 파발, 서찰, 방으로 소식을 전했어요. 오늘날에는 휴대전화, 인터넷, 우편으로 멀리 있어도 빠르게 소식을 주고받아요."},
@@ -1203,7 +1204,7 @@ function kidLine(P,w){const K=KIDS.find(k=>k[0]===P.kid),dst=S.b[w.dest],t=dst&&
   if(w.back)L.push("이제 집에 가요. 내일 또 놀아요!");else if(by[t])L.push(...by[t]);
   if(S.unlocked&&!count("school"))L.push("우리 마을에도 학교가 있으면 좋겠어요!");
   if(!count("playground"))L.push("놀이터가 없어서 심심해요…");
-  if(S.mev)L.push(S.mev.id==="trash"?"으, 쓰레기 냄새 나요!":"놀이기구가 고장 났대요…");
+  if(S.mev)L.push(S.mev.id==="trash"?"으, 쓰레기 냄새 나요!":S.mev.id==="fire"?"불이야! 소방차 불러 주세요!":"놀이기구가 고장 났대요…");
   if(S.happy>=80)L.push("우리 마을 살기 정말 좋아요!");else if(S.happy<45)L.push("요즘 마을이 좀 심심해요…");
   if(count("fest"))L.push("세계 문화 축제 또 했으면 좋겠다!");
   return L[Math.floor(Math.random()*L.length)]}
@@ -2291,11 +2292,15 @@ function happyExtra(){let e=0;if(count("museum"))e+=3;e+=Math.min(3,count("recyc
 function bigTown(){return Math.min(10,Math.floor(pop()/50)*2)}
 /* 작은 사건 */
 const MEV={trash:{ico:"🗑️",t:"쓰레기 치우기",msg:"쓰레기가 쌓여 냄새가 나요!",types:null,fix:"쓰레기를 치웠어요",need:"recycle",m:20,w:0,tip:"분리수거장이 있으면 돈 없이 치워요"},
-  broke:{ico:"🔧",t:"놀이기구 고장",msg:"놀이기구가 고장 났어요!",types:["playground","dinopark"],fix:"놀이기구를 고쳤어요",need:null,m:20,w:8,tip:"돈과 나무로 고쳐요"}};
+  broke:{ico:"🔧",t:"놀이기구 고장",msg:"놀이기구가 고장 났어요!",types:["playground","dinopark"],fix:"놀이기구를 고쳤어요",need:null,m:20,w:8,tip:"돈과 나무로 고쳐요"},
+  fire:{ico:"🔥",t:"불이 났어요!",msg:"집에 불이 났어요! 소방서가 멀어서 소방차가 늦게 와요.",types:null,fix:"불을 껐어요",need:null,m:30,w:0,tip:"소방서가 가까이(둘레 7칸) 있었다면 소방차가 금방 와서 껐을 거예요. 불이 난 동네 가까이에 소방서를 지어 보세요."}};
+function fireCovered(x){return (facs().fire||[]).some(f=>rdist(f,x.r,x.c)<=RANGE.fire)}
 function evAt(k){if(S.mev&&!MEV[S.mev.id])S.mev=null;return S.mev&&S.mev.k===k?MEV[S.mev.id]:null}
 function mevMonth(){if(S.mev&&!MEV[S.mev.id])S.mev=null;if(S.mev){if(!S.b[S.mev.k])S.mev=null;else return}if((S.tut||0)<4||pop()<15||Math.random()>.35)return;
-  const ids=Object.keys(MEV).sort(()=>Math.random()-.5);for(const id of ids){const E=MEV[id];const c=bList().filter(x=>!x.building&&isConn(x)&&(E.types?E.types.includes(x.type):isHouse(x)&&(x.occ||0)>0));
-    if(c.length){const x=c[Math.floor(Math.random()*c.length)];S.mev={id,k:x.k};return}}}
+  const ids=Object.keys(MEV).sort(()=>Math.random()-.5);for(const id of ids){const E=MEV[id];if(id==="fire"&&!(S.unlocked&&pubDone()))continue;const c=bList().filter(x=>!x.building&&isConn(x)&&(E.types?E.types.includes(x.type):isHouse(x)&&(x.occ||0)>0));
+    if(c.length){const x=c[Math.floor(Math.random()*c.length)];
+      if(id==="fire"&&fireCovered(x)){S.fireSaved=(S.fireSaved||0)+1;addNote("firesafe");setTimeout(()=>{floats.push({r:x.r,c:x.c,txt:"🚒 소방차 출동! 불을 껐어요",t0:tAnim});toast("📱 재난 문자: 마을에 불이 났지만 가까운 소방서가 출동해 금방 껐어요!")},1800);return}
+      S.mev={id,k:x.k};if(id==="fire")setTimeout(()=>toast("📱 재난 문자: 마을 집에 불이 났어요! 🔥 표시를 눌러 불을 꺼 주세요"),1800);return}}}
 function mevFix(x){const E=evAt(x.k);if(!E)return false;const free=E.need&&count(E.need);const cost={m:free?0:E.m,w:free?0:E.w};
   modal(E.ico+" "+E.t,'<p>'+E.msg+' 주민들이 불편해서 마을 행복이 5 내려갔어요.</p><p class="fine">'+E.tip+'</p>',[{t:"나중에",ghost:true},{t:free?"바로 해결하기":"해결하기 (돈 "+E.m+(E.w?" · 나무 "+E.w:"")+")",f:()=>{if(!afford(cost)){toast(lackMsg(cost));return}spend(cost);S.mev=null;sfx("good");gainXP(10);S.happy=calcHappy();floats.push({r:x.r,c:x.c,txt:E.fix+"!",t0:tAnim});save();update()}}]);return true}
 
