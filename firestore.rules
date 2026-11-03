@@ -42,6 +42,20 @@ service cloud.firestore {
       allow delete: if isAdmin() || (signedIn() && resource.data.by == request.auth.uid);
     }
 
+    // 플레이 통계: 기기별 하루 한 번 / 처음 한 번 기록, 관리자만 읽기
+    match /plays/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['d','at','uid'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.d is string && request.resource.data.d.size() == 8
+        && id == request.resource.data.d + '_' + request.auth.uid;
+      allow read: if isAdmin();
+    }
+    match /devices/{id} {
+      allow create: if signedIn() && id == request.auth.uid && request.resource.data.keys().hasOnly(['at']);
+      allow read: if isAdmin();
+    }
+
     // 선생님께 말하기: 누구나 보내고, 관리자만 읽기
     match /feedback/{id} {
       allow create: if signedIn();

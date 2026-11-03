@@ -20,6 +20,7 @@ button.warn{background:#fff;color:var(--alert);border-color:var(--alert)}
 .tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
 .tabs button.on{outline:3px solid #f2c94c}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}.stat b{display:block;font-size:28px;margin-top:4px}.bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding:10px 4px 0}.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;font-size:12px;height:100%}.bar i{display:block;width:100%;background:#2f7a55;border-radius:6px 6px 0 0;min-height:2px}
 .post{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .post img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;background:#ddd}
 .post .m{padding:8px 10px;font-size:13px;display:flex;flex-direction:column;gap:4px}
@@ -37,7 +38,7 @@ button.warn{background:#fff;color:var(--alert);border-color:var(--alert)}
   <button id="go">Google 계정으로 들어가기</button> <span class="fine" id="lmsg"></span>
 </div>
 <div id="app" hidden>
-  <div class="tabs"><button data-t="boast" class="on">자랑 게시판</button><button data-t="fb" class="ghost">선생님께 말하기</button><button class="ghost" id="clean">오래된 자랑 청소</button><button class="ghost" id="out">나가기</button></div>
+  <div class="tabs"><button data-t="boast" class="on">자랑 게시판</button><button data-t="fb" class="ghost">선생님께 말하기</button><button data-t="stat" class="ghost">통계</button><button class="ghost" id="clean">오래된 자랑 청소</button><button class="ghost" id="out">나가기</button></div>
   <p class="fine" id="info"></p>
   <div id="list"></div>
 </div>
@@ -58,8 +59,17 @@ load(B+"firebase-app-compat.js").then(()=>Promise.all([load(B+"firebase-auth-com
 $("go").onclick=async()=>{$("lmsg").textContent="확인 중…";try{await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());$("lmsg").textContent=""}catch(e){$("lmsg").textContent="들어가지 못했어요: "+(e.code||e.message)}};
 $("out").onclick=()=>firebase.auth().signOut();
 document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll("[data-t]").forEach(x=>{x.className=x===b?"on":"ghost"});show()});
+const cnt=async q=>{try{if(q.count){const s=await q.count().get();return s.data().count}}catch(e){}const s=await q.get();return s.size};
+const dkey=t=>{const d=new Date(t);return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")};
+async function stats(){const now=Date.now(),days=[...Array(7)].map((_,i)=>dkey(now-(6-i)*DAY));
+  const q=await db.collection("plays").where("d",">=",days[0]).get();const per={};const uniq=new Set();q.docs.forEach(d=>{const v=d.data();per[v.d]=(per[v.d]||0)+1;uniq.add(v.uid)});
+  const [villages,devices,boast]=await Promise.all([cnt(db.collection("villages")),cnt(db.collection("devices")),cnt(db.collection("boast"))]);
+  const max=Math.max(1,...days.map(d=>per[d]||0));
+  $("info").textContent="숫자는 기기(브라우저) 기준이에요. 같은 아이가 다른 기기에서 하면 따로 세져요.";
+  $("list").innerHTML='<div class="stats"><div class="stat">오늘 플레이한 기기<b>'+(per[days[6]]||0)+'</b></div><div class="stat">최근 7일 플레이한 기기<b>'+uniq.size+'</b></div><div class="stat">지금까지 플레이한 기기<b>'+devices+'</b></div><div class="stat">아이디를 만든 마을<b>'+villages+'</b></div><div class="stat">자랑 게시물(지우기 전)<b>'+boast+'</b></div></div>'+
+    '<div class="card" style="margin-top:12px"><b>최근 7일, 날마다 플레이한 기기 수</b><div class="bars">'+days.map(d=>'<div class="bar"><span>'+(per[d]||0)+'</span><i style="height:'+Math.round((per[d]||0)/max*100)+'%"></i><span>'+(+d.slice(4,6))+'/'+(+d.slice(6))+'</span></div>').join("")+'</div></div>'}
 async function show(){$("list").innerHTML='<p class="fine">불러오는 중…</p>';
-  try{if(tab==="boast"){const q=await db.collection("boast").orderBy("at","desc").limit(200).get();const now=Date.now();
+  try{if(tab==="stat"){await stats();return}if(tab==="boast"){const q=await db.collection("boast").orderBy("at","desc").limit(200).get();const now=Date.now();
       $("info").textContent="자랑 "+q.size+"개 (7일이 지나면 게임에서 안 보이고, 14일이 지나면 지워져요)";
       $("list").innerHTML='<div class="grid">'+q.docs.map(d=>{const p=d.data(),age=Math.floor((now-p.at)/DAY);return '<div class="post'+(p.hidden?" hid":"")+'"><img src="'+p.img+'" alt=""><div class="m"><b>'+esc(p.school)+' '+esc(p.year)+'학년 · '+esc(p.nick)+'</b><span>'+(p.texts||[]).map(t=>PH[t]||t).join(" · ")+'</span><span class="fine">'+age+'일 전'+(p.hidden?" · 숨김":"")+'</span></div><div class="row"><button class="ghost" data-h="'+d.id+'" data-v="'+(p.hidden?0:1)+'">'+(p.hidden?"다시 보이기":"숨기기")+'</button><button class="warn" data-d="'+d.id+'">지우기</button></div></div>'}).join("")+'</div>';
       $("list").querySelectorAll("[data-h]").forEach(b=>b.onclick=async()=>{await db.collection("boast").doc(b.dataset.h).update({hidden:b.dataset.v==="1"});show()});

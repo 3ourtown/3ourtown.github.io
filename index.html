@@ -2523,6 +2523,12 @@ window.addEventListener("pagehide",()=>{save();if(ACCT.ref)cloudSave(true)});
 setInterval(()=>{if(S&&$("acct").hidden)save()},20000);
 function migrate(){if(S.unlocked&&!S.pubSeq)S.pubAll=1;if(!S.tl){S.tl=[{y:1,m:3,t:"마을이 생겼어요"}]}S.grade=S.grade||0;if(S.month==null)S.month=[3,6,9,12][S.season||0];S.season=SEASON_OF(S.month);S.items=S.items||{};S.evDone=S.evDone||{};Object.values(S.b).forEach(b=>{if(b.type==="hospital")b.n=1});{const H=S.b["17,16"];if(H&&H.type==="hall"&&!["16,15","16,16","17,15"].some(k=>S.b[k]||T[+k.split(",")[0]][+k.split(",")[1]]!=="g"||Object.values(S.b).some(()=>false))){let free=true;for(const x of bList()){if(x.k==="17,16")continue;const n=x.n||1;for(const [rr,cc] of [[16,15],[16,16],[17,15]])if(rr>=x.r&&rr<x.r+n&&cc>=x.c&&cc<x.c+n)free=false}if(free&&!(S.roads&&(S.roads["16,15"]||S.roads["16,16"]||S.roads["17,15"]))){delete S.b["17,16"];S.b["16,15"]={...H,n:2}}}}S.happy=calcHappy();}
 function afterLogin(){if(S&&!S.startBonus){S.startBonus=1;S.money+=100;save();setTimeout(()=>say("이장님, 마을 지원금이 나왔다네! 돈 +100. 마을을 더 멋지게 가꿔 보게.",null,"elder","h"),3500)}setTimeout(()=>{if(typeof checkUnlock==="function"){checkUnlock();update()}},1500);newbInit();setTimeout(()=>{if(typeof bongHint==="function"&&$("elder").hidden&&$("veil").hidden)bongHint()},9000);setTimeout(()=>{if(typeof noriHint==="function")noriHint()},4000);if(S.unlocked&&!S.conds&&pubDone())setTimeout(()=>say("이장님, 하나 묻겠네. 이장님이 생각하는 살기 좋은 마을은 어떤 마을인가?",()=>condPick(true)),2500);S.happy=calcHappy();updAcct();updSnd();setTimeout(sndAsk,400);setTool(null);sel=null;$("info").hidden=true;update();intro();setTimeout(()=>{if($("elder").hidden&&$("veil").hidden)evNotice()},1200)}
+function playMark(){if(!ACCT.db)return;const d=new Date(),day=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+  let uid=ACCT.uid;if(!uid){try{uid=localStorage.getItem("ijang-devid")||("d"+Math.random().toString(36).slice(2,12));localStorage.setItem("ijang-devid",uid)}catch(e){return}}
+  let seen="";try{seen=localStorage.getItem("ijang-seen-day")||""}catch(e){}
+  if(seen!==day){ACCT.db.collection("plays").doc(day+"_"+uid).set({d:day,at:Date.now(),uid}).then(()=>{try{localStorage.setItem("ijang-seen-day",day)}catch(e){}}).catch(()=>{try{localStorage.setItem("ijang-seen-day",day)}catch(e){}})}
+  let first="";try{first=localStorage.getItem("ijang-seen-first")||""}catch(e){}
+  if(!first)ACCT.db.collection("devices").doc(uid).set({at:Date.now()}).then(()=>{try{localStorage.setItem("ijang-seen-first","1")}catch(e){}}).catch(()=>{try{localStorage.setItem("ijang-seen-first","1")}catch(e){}})}
 function fbInit(){const cfg=window.FIREBASE_CONFIG;if(!cfg||!cfg.apiKey)return Promise.resolve(null);
   const load=src=>new Promise((res,rej)=>{const e=document.createElement("script");e.src=src;e.onload=res;e.onerror=rej;document.head.appendChild(e)});const B="https://www.gstatic.com/firebasejs/10.12.2/";
   return load(B+"firebase-app-compat.js").then(()=>Promise.all([load(B+"firebase-auth-compat.js"),load(B+"firebase-firestore-compat.js")])).then(()=>{if(!firebase.apps.length)firebase.initializeApp(cfg);return new Promise(r=>{const un=firebase.auth().onAuthStateChanged(u=>{un();r(u)})}).then(u=>u?{user:u}:firebase.auth().signInAnonymously())})
@@ -2533,7 +2539,7 @@ function start(data){
     window.addEventListener("resize",resize);resize();if(window.ResizeObserver)new ResizeObserver(()=>{if(stage.clientWidth!==W||stage.clientHeight!==H){resize();try{draw()}catch(e){}}}).observe(stage);update();requestAnimationFrame(frame);
     acctShow('<p>마을 장부를 펴는 중…</p>');
     const use=window.claude&&typeof window.claude.use==="function"?window.claude.use("db").catch(()=>null):fbInit();
-    Promise.race([use,new Promise(r=>setTimeout(()=>r(null),9000))]).then(db=>{ACCT.db=db||null;acctHome()})})}
+    Promise.race([use,new Promise(r=>setTimeout(()=>r(null),9000))]).then(db=>{ACCT.db=db||null;acctHome();try{playMark()}catch(e){}})})}
 if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(()=>S);
 (window.claude&&window.claude.hot&&window.claude.hot.ready)?window.claude.hot.ready(start):start(window.claude&&window.claude.hot&&window.claude.hot.data||{});
 })();
