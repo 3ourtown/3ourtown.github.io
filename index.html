@@ -26,7 +26,7 @@
   --font:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
   color-scheme:light;
 }
-[hidden]{display:none!important}
+[hidden]{display:none!important}#plblock{position:fixed;inset:0;z-index:200;background:rgba(20,30,45,.82);display:flex;align-items:center;justify-content:center;padding:16px}.plcard{background:var(--paper);border-radius:18px;padding:28px 24px;max-width:380px;text-align:center;box-shadow:0 10px 40px #0005}.plcard h2{margin:8px 0}.plcard p{line-height:1.6}.plcard .linkb{margin-top:14px;opacity:.55;font-size:12px}
 #acctbtn{position:relative;overflow:visible}#acctbtn.saved{box-shadow:0 0 0 2px #5fae7f}#acctbtn.saved::after{content:"저장됨 ✓";position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:3px;background:#2f7a55;color:#fff;font-size:11px;border-radius:999px;padding:1px 7px;white-space:nowrap;pointer-events:none;z-index:5}
 button,.card,.brand{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .fbar{margin:8px 0}.fbar>div{display:flex;justify-content:space-between;font-size:14px;margin-bottom:3px}.fbar i{display:block;height:10px;border-radius:999px;background:linear-gradient(90deg,#e9a92c,#f3c96a);box-shadow:inset 0 0 0 1px #0001}.fbar .tr{display:block;background:#efe5cf;border-radius:999px;overflow:hidden}.fbar.ok i{background:linear-gradient(90deg,#2f7a55,#5fae7f)}
@@ -582,7 +582,7 @@ function fresh(){const o={roads:{},money:100,wood:15,xp:0,level:1,season:0,year:
   lowStreak:0,unlocked:false,unlockSeason:0,seasonsTotal:0,happy:50,zone:0,month:3,items:{},evDone:{}};
   o.b["16,15"]={type:"hall",n:2};return o}
 function load(){try{const raw=localStorage.getItem("ijang-demo-v2");if(raw){const o=JSON.parse(raw);if(o&&o.b)return o}}catch(e){}return null}
-function save(){if(!S)return;S.savedAt=Date.now();try{const j=JSON.stringify(S);localStorage.setItem("ijang-demo-v2",j);if(typeof ACCT!=="undefined"&&ACCT.id)localStorage.setItem("ijang-v2-"+ACCT.id,j)}catch(e){}if(typeof cloudSave==="function")cloudSave();savedMark()}
+function save(){if(!S)return;if(DEV)S.devUsed=1;S.savedAt=Date.now();try{const j=JSON.stringify(S);localStorage.setItem("ijang-demo-v2",j);if(typeof ACCT!=="undefined"&&ACCT.id)localStorage.setItem("ijang-v2-"+ACCT.id,j)}catch(e){}if(typeof cloudSave==="function")cloudSave();savedMark()}
 let SAVED_T=0;function savedMark(){const b=document.getElementById("acctbtn");if(!b||b.hidden)return;clearTimeout(SAVED_T);b.classList.add("saved");SAVED_T=setTimeout(()=>b.classList.remove("saved"),1400)}
 const key=(r,c)=>r+","+c;
 function bList(){return Object.entries(S.b).map(([k,v])=>{const [r,c]=k.split(",").map(Number);return{r,c,k,...v}})}
@@ -2037,6 +2037,27 @@ function gradShow(first){const img=snapVillage(700),nick=(typeof ACCT!=="undefin
     '<div class="row"><button class="ghost" id="cgo">마을 자랑하기</button><button id="cx">계속 마을 가꾸기</button></div>';
   $("veil").hidden=false;$("cx").onclick=()=>{$("veil").hidden=true};$("cgo").onclick=()=>{$("veil").hidden=true;boastOpen()};
   if(first){sfx("level");S.money+=100;gainXP(50);try{localStorage.setItem("ijang-grad-"+((typeof ACCT!=="undefined"&&ACCT.id)||"local"),JSON.stringify(S))}catch(e){}save();update()}}
+
+/* ---------- 하루 놀이 시간 제한 (기본 1시간, 기기별 설정) ---------- */
+const PL_DEF=60;let PL_LAST=Date.now(),PL_BLOCK=false;
+["pointerdown","keydown","wheel","touchstart"].forEach(ev=>document.addEventListener(ev,()=>{PL_LAST=Date.now()},{passive:true,capture:true}));
+function plDay(){const d=new Date();return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")}
+function plGet(k,def){try{const v=localStorage.getItem(k);return v==null?def:v}catch(e){return def}}
+function plSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function plLimitMs(){const m=+plGet("ijang-limit",PL_DEF);if(!m)return Infinity;const day=plDay();if(plGet("ijang-unlock","")===day)return Infinity;return m*60000+(+plGet("ijang-bonus-"+day,0))}
+function plUsed(){const day=plDay();let dev=0;try{const o=JSON.parse(plGet("ijang-play","{}"));if(o.d===day)dev=o.ms||0}catch(e){}const acc=(S&&S.play&&S.play.d===day)?(S.play.ms||0):0;return Math.max(dev,acc)}
+function plAdd(ms){const day=plDay(),u=plUsed()+ms;plSet("ijang-play",JSON.stringify({d:day,ms:u}));if(S)S.play={d:day,ms:u}}
+function plBlockShow(){if(PL_BLOCK)return;PL_BLOCK=true;save();let el=$("plblock");if(!el){el=document.createElement("div");el.id="plblock";document.body.appendChild(el)}
+  el.innerHTML='<div class="plcard"><div style="font-size:54px">🌙</div><h2>오늘 놀이 시간이 다 됐어요</h2><p>이장님도 조금은 쉬세요~<br>마을 사람들도 쉬고 있을게요. 내일 또 만나요!</p><button class="linkb" id="plteach">선생님</button></div>';
+  el.hidden=false;$("plteach").onclick=()=>{el.hidden=true;PL_BLOCK=false;devOpen();setTimeout(()=>{if(!DEV&&plUsed()>=plLimitMs())plBlockShow()},400)}}
+setInterval(()=>{if(!S||!$("acct").hidden||DEV)return;if(PL_BLOCK)return;
+  if(document.visibilityState==="visible"&&Date.now()-PL_LAST<60000)plAdd(1000);
+  if(plUsed()>=plLimitMs()&&$("veil").hidden)plBlockShow()},1000);
+function plDevButtons(){const day=plDay(),m=+plGet("ijang-limit",PL_DEF);return[
+  {t:"놀이 시간: 오늘 다시 채우기 (이 기기)",ghost:true,keep:true,f:()=>{plSet("ijang-play",JSON.stringify({d:day,ms:0}));if(S)S.play={d:day,ms:0};plSet("ijang-bonus-"+day,0);PL_BLOCK=false;if($("plblock"))$("plblock").hidden=true;save();toast("오늘 놀이 시간을 다시 채웠어요")}},
+  {t:"놀이 시간 +10분 (오늘, 이 기기)",ghost:true,keep:true,f:()=>{plSet("ijang-bonus-"+day,(+plGet("ijang-bonus-"+day,0))+600000);PL_BLOCK=false;if($("plblock"))$("plblock").hidden=true;toast("오늘 10분 더 놀 수 있어요")}},
+  {t:"하루 제한 바꾸기 (지금 "+(m?m+"분":"제한 없음")+")",ghost:true,keep:true,f:()=>{const L=[30,60,90,0],nx=L[(L.indexOf(m)+1)%L.length];plSet("ijang-limit",nx);toast("이 기기의 하루 제한: "+(nx?nx+"분":"제한 없음"));devPanel()}}]}
+
 /* ---------- 마을 자랑하기 게시판 (일주일 전시 · 고르는 자랑 문장 · 응원 스티커) ---------- */
 const CHEERS=[["👏","멋져요"],["❤️","살고 싶어요"],["🌟","최고예요"]];
 const BOAST_DAYS=7,BOAST_KEEP=14,DAYMS=86400000;
@@ -2092,6 +2113,7 @@ function boastOpen(){if(!ACCT.db){modal("마을 자랑하기",'<p>마을 자랑�
     '<p class="fine" id="bmsg">'+(posted?"오늘은 이미 자랑했어요. 내일 또 올릴 수 있어요!":"자랑은 일주일 동안 전시돼요. 하루에 한 번 올릴 수 있어요. 실제 이름은 쓰지 말고 별명을 써요.")+'</p></div></div>'+
     '<div id="bwall" class="bwall"><p class="fine">불러오는 중…</p></div>';
   $("veil").hidden=false;let shot=snapVillage(1200,true);$("bshot").src=shot||"";
+  if(S.devUsed||DEV){$("bpost").disabled=true;$("bmsg").textContent="개발자 모드를 쓴 시험 마을이라 자랑 게시판에 올릴 수 없어요. 친구들 자랑은 볼 수 있어요.";}
   const bindPh=()=>$("bphs").querySelectorAll("[data-ph]").forEach(b=>b.onclick=()=>{const id=b.dataset.ph;if(picks.includes(id))picks=picks.filter(x=>x!==id);else{if(picks.length>=3){toast("자랑은 3개까지 고를 수 있어요");return}picks.push(id)}$("bphs").innerHTML=phHTML();bindPh()});bindPh();
   $("bre").onclick=()=>{$("veil").hidden=true;setTimeout(()=>{shot=snapVillage(1200,true);$("veil").hidden=false;$("bshot").src=shot||""},60)};
   $("bpost").onclick=async()=>{const school=$("bsch").value.trim(),nick=$("bnick").value.trim(),year=+$("byr").value;
@@ -2317,6 +2339,7 @@ function devPanel(){modal("개발자 모드 켜짐",'<ul><li>돈과 나무가 �
   {t:"행사 달 바꾸기",ghost:true,keep:true,f:()=>{setTimeout(save,50);EV_MONTH=realMonth()%12+1;toast("이달의 행사: "+EV_MONTH+"월 "+EVENTS[EV_MONTH].nm);update()}},
   {t:"행사 다시 하기",ghost:true,keep:true,f:()=>{setTimeout(save,50);delete S.evDone[evKey()];toast("이번 달 행사를 다시 할 수 있어요");update()}},
   {t:"특별 아이템 +3",ghost:true,keep:true,f:()=>{setTimeout(save,50);Object.keys(ITEMS).forEach(k=>S.items[k]=(S.items[k]||0)+3);toast("특별 아이템 4종 +3");update()}},
+  ...plDevButtons(),
   {t:"개발자 모드 끄기",ghost:true,f:()=>{DEV=false;try{sessionStorage.removeItem("ijang-dev")}catch(e){}update();toast("개발자 모드를 껐어요")}},{t:"닫기"}])}
 {const br=document.querySelector(".brand");let taps=0,tT=0,lp=null;
   const hit=()=>{const n=Date.now();taps=n-tT<900?taps+1:1;tT=n;if(taps>=5){taps=0;devOpen()}};
