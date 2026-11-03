@@ -81,7 +81,7 @@ button,.card,.brand{touch-action:manipulation;-webkit-tap-highlight-color:transp
 .cert img{width:100%;border-radius:10px;border:1px solid #e6d3a0;margin-bottom:8px}.cert p{line-height:1.6}.cert-tl{text-align:left;font-size:12px;color:#6f5a30;margin:6px auto;max-width:420px}.cert-d{font-size:12px;color:#7a5a12;margin-top:6px}
 .bnew{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:10px;align-items:start}.bnew img{width:100%;border-radius:10px;border:1px solid var(--line);background:#eef}.bnew input{width:100%;font:inherit;padding:8px 10px;border:1px solid #d9ccb2;border-radius:8px;box-sizing:border-box;margin-top:4px}
 @media (max-width:560px){.bnew{grid-template-columns:1fr}}
-.bwall{display:flex;flex-direction:column;gap:10px;max-height:52vh;overflow:auto;margin-top:12px}.bprof{display:grid;grid-template-columns:minmax(0,1.3fr) 84px minmax(0,1fr);gap:6px;margin-bottom:6px}.bprof input,.bprof select{min-width:0;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:14px}.bphs{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.bph{padding:6px 10px;border-radius:999px;font-size:13px;background:#fff;border:1.5px solid var(--line)}.bph.on{background:#e7f3ea;border-color:#2f7a55;font-weight:700}.btags{display:flex;flex-wrap:wrap;gap:4px}.btags i{font-style:normal;font-size:13px;background:#fff6e0;border:1px solid #ecd9a8;border-radius:999px;padding:2px 8px}.bhof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.bsmall .bmeta b{font-size:12px}.bsmall .btags i{font-size:11px}.bdday{color:#c8503b}.bpost{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}.bpost>img{width:100%;display:block}.bmeta{display:flex;flex-direction:column;gap:2px;padding:6px 10px}.bmeta span{font-size:14px}
+.bwall{display:flex;flex-direction:column;gap:10px;max-height:52vh;overflow:auto;margin-top:12px}.bprof{display:grid;grid-template-columns:minmax(0,1.3fr) 84px minmax(0,1fr);gap:6px;margin-bottom:6px}.bprof input,.bprof select{min-width:0;padding:7px 8px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:14px}.bphs{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.bph{padding:6px 10px;border-radius:999px;font-size:13px;background:#fff;border:1.5px solid var(--line)}.bph.on{background:#e7f3ea;border-color:#2f7a55;font-weight:700}.btags{display:flex;flex-wrap:wrap;gap:4px}.btags i{font-style:normal;font-size:13px;background:#fff6e0;border:1px solid #ecd9a8;border-radius:999px;padding:2px 8px}.bhof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.bsmall .bmeta b{font-size:12px}.bsmall .btags i{font-size:11px}.bdday{color:#c8503b}.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}.bthumb{padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;align-items:stretch;text-align:left;color:var(--ink);font-weight:400}.bthumb img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#e8efe2}.bthumb .bt-n{padding:4px 8px 0;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bthumb .bt-c{padding:0 8px 6px;font-size:12px;color:var(--muted)}.bdetail{display:flex;flex-direction:column;gap:8px}.bdetail>img{width:100%;border-radius:12px;border:1px solid var(--line)}.bdetail #bback{align-self:flex-start}.bcheers.big button{font-size:16px;padding:10px 14px}.bpost{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}.bpost>img{width:100%;display:block}.bmeta{display:flex;flex-direction:column;gap:2px;padding:6px 10px}.bmeta span{font-size:14px}
 .bcheers{display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 10px;align-items:center}.bcheers button{border:1px solid var(--line);background:#fffaf0;border-radius:999px;padding:4px 10px;font:inherit;font-size:13px}.bcheers button.on{background:#fff3cf;border-color:#e9a92c}.bcheers button i{font-style:normal;font-weight:700;margin-left:2px}.bcheers .bdel{background:#fbe9e4;border-color:#c8503b}
 .mclose{position:sticky;top:-6px;float:right;z-index:3;margin:-6px -6px 4px 8px;border:1px solid var(--line);background:#fffdf7;border-radius:999px;padding:6px 12px;font:inherit;font-size:14px;font-weight:600;box-shadow:0 2px 6px #0002;cursor:pointer}
 .ssteps{margin:6px 0 10px;padding-left:22px;line-height:1.9}.ssteps li{color:#9a8f7a}.ssteps li.ok{color:#2f7a55}.ssteps li.now{color:#2a2620;font-weight:700}
@@ -455,15 +455,15 @@ const WISHES=[
   {id:"w1",who:"형락",face:"f_hyeongrak",thx:"이장님, 놀이터 최고예요! 매일 친구들이랑 술래잡기해요!",text:"친구들이랑 뛰어놀 곳이 없어요! 심심해요!",need:"playground",when:s=>s.pop>=2},
   {id:"w2",who:"김순자 할머니",face:"f_grandma",thx:"아이고 이장님, 공원에서 쉬니 다리가 하나도 안 아프구먼. 고마워요!",text:"천천히 걸으며 쉴 수 있는 곳이 있으면 좋겠구먼.",need:"park",when:s=>s.pop>=6},
   {id:"w3",who:"박 씨 아저씨",face:"f_park",thx:"이장님 덕분에 이제 우리 마을 시장에서 장을 봐요. 최고예요!",text:"장 보러 옆 마을까지 가야 해서 힘들어요.",need:"market",when:s=>s.pop>=10},
-  {id:"w4",who:"응우옌 가족",face:"f_nguyen",thx:"이장님, 병원에서 진료받고 아이가 다 나았어요. 정말 감사해요!",text:"아이가 열이 나요. 진료받을 곳이 있을까요?",need:"hospital",when:s=>s.unlocked},
-  {id:"w5",who:"정우",face:"f_jeongwoo",thx:"이장님! 학교가 가까워져서 친구들이랑 매일 같이 가요. 고마워요!",text:"공부하고 친구도 만날 곳이 너무 멀어요.",need:"school",when:s=>s.unlocked&&s.since>=1},
-  {id:"w6",who:"이도윤 씨",face:"f_doyun",thx:"경찰서가 생기니 밤길도 든든해요. 이장님, 고맙습니다!",text:"밤에 골목이 무서워요. 동네를 지켜 줄 곳이 필요해요.",need:"police",when:s=>s.unlocked&&s.since>=2},
-  {id:"w7",who:"최 씨 할아버지",face:"f_choi",thx:"소방서가 생겨서 이제 마음 놓고 겨울을 나겠어. 이장님, 고맙네!",text:"겨울엔 불이 날까 걱정이야. 누가 도와주러 올까?",need:"fire",when:s=>s.unlocked&&s.since>=3},
+  {id:"w4",who:"응우옌 가족",face:"f_nguyen",thx:"이장님, 병원에서 진료받고 아이가 다 나았어요. 정말 감사해요!",text:"아이가 열이 나요. 진료받을 곳이 있을까요?",need:"hospital",when:s=>s.unlocked&&!isLocked("hospital")},
+  {id:"w5",who:"정우",face:"f_jeongwoo",thx:"이장님! 학교가 가까워져서 친구들이랑 매일 같이 가요. 고마워요!",text:"공부하고 친구도 만날 곳이 너무 멀어요.",need:"school",when:s=>s.unlocked&&!isLocked("school")},
+  {id:"w6",who:"이도윤 씨",face:"f_doyun",thx:"경찰서가 생기니 밤길도 든든해요. 이장님, 고맙습니다!",text:"밤에 골목이 무서워요. 동네를 지켜 줄 곳이 필요해요.",need:"police",when:s=>s.unlocked&&!isLocked("police")},
+  {id:"w7",who:"최 씨 할아버지",face:"f_choi",thx:"소방서가 생겨서 이제 마음 놓고 겨울을 나겠어. 이장님, 고맙네!",text:"겨울엔 불이 날까 걱정이야. 누가 도와주러 올까?",need:"fire",when:s=>s.unlocked&&!isLocked("fire")},
   {id:"k1",who:"시형",face:"f_sihyeong",thx:"박물관에서 옛날 물건을 봤어요! 교과서에서 본 거랑 똑같아요.",text:"옛날 사람들이 쓰던 물건을 직접 보고 싶어요.",need:"museum",when:s=>s.av("museum")},
   {id:"k2",who:"희민",face:"f_heemin",thx:"놀이 마당에서 윷놀이 했어요! 제가 모 나왔어요!",text:"명절에 친구들이랑 윷놀이하고 싶어요! 민속마을에 놀 곳이 있으면 좋겠어요.",need:"nori",when:s=>s.av("nori")},
   {id:"k3",who:"온조",face:"f_onjo",thx:"버스 정류장이 생겨서 버스 타고 학교 가요. 정말 편해요!",text:"학교가 멀어서 걸어가기 힘들어요. 버스를 탈 수 있으면 좋겠어요.",need:"busstop",when:s=>s.av("busstop")},
   {id:"k4",who:"화목",face:"f_hwamok",thx:"우체국에서 할머니께 편지 보냈어요! 답장 오면 자랑할게요!",text:"멀리 사는 할머니께 편지를 보내고 싶어요! 어디로 가져가야 해요?",need:"post",when:s=>s.av("post")},
-  {id:"k5",who:"온순",face:"f_onsun",thx:"캔, 종이, 플라스틱을 따로 버렸어요. 지구를 지킨 것 같아 뿌듯해요!",text:"쓰레기를 종류별로 나눠 버릴 곳이 없어요. 지구가 아파요.",need:"recycle",when:s=>s.av("recycle")&&s.pop>=25},
+  {id:"k5",who:"온순",face:"f_onsun",thx:"캔, 종이, 플라스틱을 따로 버렸어요. 지구를 지킨 것 같아 뿌듯해요!",text:"쓰레기를 종류별로 나눠 버릴 곳이 없어요. 지구가 아파요.",need:"recycle",when:s=>s.av("recycle")&&s.pop>=25&&pubDone()},
   {id:"k6",who:"화영",face:"f_hwayoung",thx:"축제에서 다른 나라 친구들이랑 춤췄어요! 너무 재밌었어요!",text:"다른 나라에서 온 친구들이랑 다 같이 노는 날이 있으면 좋겠어요!",need:"fest",when:s=>s.av("fest")},
   {id:"k7",who:"시진",face:"f_sijin",thx:"새 공원 나무 그늘에서 책 읽었어요. 조용하고 좋아요.",text:"조용히 책 읽을 곳이 필요해요. 공원이 하나 더 있으면 좋겠어요.",need:"park",n:2,when:s=>s.pop>=45},
   {id:"k8",who:"준희",face:"f_junhee",thx:"공룡 놀이공원 진짜 최고예요! 롤러코스터 세 번 탔어요!",text:"진짜 큰 공룡을 볼 수 있는 곳이 있으면 좋겠어요! 놀이터랑 공원을 합치면 어떨까요?",need:"dinopark",when:s=>s.dino}
@@ -578,7 +578,7 @@ for(let r=0;r<N;r++)for(let c=0;c<N;c++){
 /* ---------- state ---------- */
 let S;
 function terr(r,c){if(isBridge(r,c))return "p";if(S&&S.roads&&S.roads[r+","+c])return "p";const tv=S&&S.tov&&S.tov[r+","+c];if(tv)return tv==="c"?"g":"f";return T[r][c]}
-function fresh(){const o={roads:{},money:100,wood:15,xp:0,level:1,season:0,year:1,b:{},wishes:[],doneWishes:[],notes:[],quizDone:[],tut:0,
+function fresh(){const o={roads:{},money:200,startBonus:1,wood:15,xp:0,level:1,season:0,year:1,b:{},wishes:[],doneWishes:[],notes:[],quizDone:[],tut:0,
   lowStreak:0,unlocked:false,unlockSeason:0,seasonsTotal:0,happy:50,zone:0,month:3,items:{},evDone:{}};
   o.b["16,15"]={type:"hall",n:2};return o}
 function load(){try{const raw=localStorage.getItem("ijang-demo-v2");if(raw){const o=JSON.parse(raw);if(o&&o.b)return o}}catch(e){}return null}
@@ -693,7 +693,7 @@ function draw(){const RS=(typeof rangeShow==="function")?rangeShow():null;TAGHIT
           ctx.drawImage(im,(p.x-m.ax*w)*z+view.x,(p.y-m.ay*h)*z+view.y,w*z,h*z)});
         const pt=wpos(x.r,x.c),pb=wpos(x.r+2,x.c+2);R={x:pt.x-TW,y:pt.y-TH*1.2,w:2*TW,h:pb.y-pt.y+TH*1.2};RECTS[x.k]=R;
         if(sel&&sel.k===x.k){ctx.strokeStyle="rgba(233,169,44,.95)";ctx.lineWidth=3;const q=toScreen(R.x,R.y);ctx.strokeRect(q.x,q.y,R.w*z,R.h*z)}
-        if(x.type==="hall"){hallDeco(R);const q=toScreen(R.x+R.w/2,R.y+TH*.2);tag(q.x,q.y,hallTag(),false,x.k)}
+        if(x.type==="hall"){hallDeco(R);const q=toScreen(R.x+R.w/2,R.y+TH*.2);{const nx=HALLS[hallLv()],up=!!(nx&&afford(nx));tag(q.x,q.y,hallTag(),false,up?x.k:undefined)}}
         else if(x.type==="fest"&&isConn(x)){const q=toScreen(R.x+R.w/2,R.y+TH*.2);tag(q.x,q.y,"🎉 세계 문화 축제 열기",false,x.k)}
         else if(x.type==="nori"&&isConn(x)){const q=toScreen(R.x+R.w/2,R.y+TH*.2);tag(q.x,q.y,noriLabel(),false,x.k)}
         else if(!isConn(x)){const q=toScreen(R.x+R.w/2,R.y+TH*.6);tag(q.x,q.y,"길이 없어요",true)}
@@ -709,7 +709,7 @@ function draw(){const RS=(typeof rangeShow==="function")?rangeShow():null;TAGHIT
       if(sel&&sel.k===x.k&&R){ctx.strokeStyle="rgba(233,169,44,.95)";ctx.lineWidth=3;const q=toScreen(R.x,R.y);ctx.strokeRect(q.x,q.y,R.w*z,R.h*z)}
       if(R){const top=toScreen(R.x+R.w/2,R.y);
         if(x.type==="digsite"&&(x.stock||0)>=1)tag(top.x,top.y+14,"유물 발견! 눌러요",false,x.k);
-        if(x.type==="lumber"){const s=Math.floor(x.stock||0),cp=LUMB[lumLv(x)-1].cap;if(s>=1)tag(top.x,top.y+10,"나무 "+s+(s>=cp?" 가득":""),s>=cp,x.k)}
+        if(x.type==="lumber"){const s=Math.floor(x.stock||0),cp=LUMB[lumLv(x)-1].cap;if(s>=1)tag(top.x,top.y+10,"나무 "+s+(s>=cp?" 가득":""),s>=cp,x.k);else if(!x.building&&isConn(x)&&lumRate(x)<=0)tag(top.x,top.y+10,"🌲 숲이 멀어요 · 나무가 안 나와요",true,x.k)}
         if(x.building){const left=Math.max(0,Math.ceil((x.building-Date.now())/1000));tag(top.x,top.y+6,"짓는 중 "+left+"초")}
         
         {const E=evAt(x.k);if(E&&!x.building)tag(top.x,top.y+(x.type==="lumber"?40:14),E.ico+" "+E.t,true,x.k)}if(x.type==="paddy"&&!x.building&&riceReady(x))tag(top.x,top.y+14,"🌾 벼 베기!",false,x.k);
@@ -782,7 +782,16 @@ function paintRoad(r,c,erase){const k=r+","+c;
   const ok=canRoad(r,c);if(!ok.ok)return ok.why;if(!DEV&&S.money<ROAD_COST)return"돈이 부족해요.";
   if(!DEV)S.money-=ROAD_COST;S.roads[k]=1;connDirty=true;if(!S.notes.includes("road"))addNote("road");return null}
 function afford(o){return DEV||(S.money>=o.m&&S.wood>=o.w)}
-function isLocked(type){return DEFS[type].pub&&!S.unlocked}
+const PUBSEQ=["police","fire","hospital","school"];
+function pubDone(){if(!S.unlocked)return false;if(S.pubAll)return true;if(PUBSEQ.every(t=>bList().some(x=>x.type===t))){S.pubAll=1;return true}return false}
+function pubNext(){return PUBSEQ.find(t=>!bList().some(x=>x.type===t))}
+function pubWait(t){if(!S.unlocked||S.pubAll||!PUBSEQ.includes(t))return false;const nx=pubNext();return !!nx&&PUBSEQ.indexOf(t)>PUBSEQ.indexOf(nx)}
+function pubTick(){if(!S||!S.unlocked||!S.pubSeq||!$("veil").hidden||!$("elder").hidden)return;const nx=pubNext(),k=nx||"done";if(S.pubTold===k)return;
+  if(!S.pubTold){S.pubTold="police";return}S.pubTold=k;save();const NM={fire:"소방서",hospital:"병원",school:"학교"};
+  if(nx)say("좋아! 이제 "+NM[nx]+"도 지을 수 있다네. "+(nx==="fire"?"불이 나면 달려와 줄 소방서를 지어 보게.":nx==="hospital"?"아픈 주민이 치료받을 병원을 지어 보게.":"아이들이 배우고 친구를 만날 학교를 지어 보게."),()=>pulse(nx));
+  else if(!S.conds)say("공공기관 네 곳을 모두 지었구먼! 이제 하나 묻겠네. 이장님이 생각하는 살기 좋은 마을은 어떤 마을인가?",()=>condPick(true))}
+function lockMsg(t){if(!S.unlocked)return "이장 Lv "+UNLOCK.lv+", 주민 "+UNLOCK.pop+"명이 되면 열려요.";const nx=pubNext();return DEFS[nx].nm+"을(를) 먼저 지으면 열려요."}
+function isLocked(type){return (DEFS[type].pub&&!S.unlocked)||pubWait(type)}
 function spend(o){if(!DEV){S.money-=o.m;S.wood-=o.w}}
 function lackMsg(o){return S.money<o.m?"돈이 부족해요. 다음 달에 마을 살림 돈이 들어와요.":"나무가 부족해요. 벌목장에서 나무를 거둬요."}
 function place(r,c){
@@ -809,8 +818,8 @@ function gainXP(n){const n0=S.level;S.xp+=n;let up=false;setTimeout(()=>{if(up)s
   if(up){const t0=titleOf(n0),t1=titleOf(S.level);toast("레벨 업! 이장 Lv "+S.level);checkUnlock();if(t0!==t1)setTimeout(()=>titleUp(t1),600)}}
 function checkUnlock(){
   while(S.zone<ZONES.length-1&&S.level>=ZONES[S.zone+1].lv){S.zone++;toast("새 땅이 열렸어요! 마을을 넓혀 보세요.")}
-  if(!S.unlocked&&S.level>=UNLOCK.lv&&pop()>=UNLOCK.pop){S.unlocked=true;S.unlockSeason=S.seasonsTotal;addNote("helpful");
-    say("마을이 제법 커졌구먼! 이제 학교, 병원, 소방서, 경찰서를 지을 수 있다네. 그 전에 하나 묻겠네. 이장님이 생각하는 살기 좋은 마을은 어떤 마을인가?",()=>condPick(true))}}
+  if(!S.unlocked&&S.level>=UNLOCK.lv&&pop()>=UNLOCK.pop){S.unlocked=true;S.pubSeq=1;S.unlockSeason=S.seasonsTotal;addNote("helpful");
+    say("마을이 제법 커졌구먼! 이제 공공기관을 지을 수 있다네. 한꺼번에 다 짓기는 어려우니 하나씩 해 보세. 먼저 마을의 안전을 지켜 줄 경찰서부터 지어 보게.",()=>pulse("police"))}}
 function addNote(id){if(S.notes.includes(id))return;S.notes.push(id);gainXP(10);const n=NOTES.find(x=>x.id===id);if(!n)return;toast("마을 수첩에 '"+n.t+"'이(가) 기록되었어요")}
 const WNEW={},WTHX=[];
 function checkWishes(){
@@ -879,7 +888,7 @@ function update(){
     return '<button class="card'+(NB.includes(t)?" newb":"")+(tool===t?" on":"")+(lock?" locked":"")+(poor&&!lock?" poor":"")+(pulseOn===t?" pulse":"")+'" data-t="'+t+'" title="'+(d.tip||d.nm)+'">'+
     '<img src="assets/'+d.img+'.webp" alt=""><span class="nm">'+d.nm+(d.n>1?' <small style="font-weight:400;color:#6f675a">'+d.n+'×'+d.n+'</small>':'')+'</span>'+
     '<span class="cost">'+COIN.replace('class="ico"','')+dc.m+(dc.w?' <img src="assets/logs.webp" alt="">'+dc.w:'')+'</span>'+
-    (lock?'<span class="lock">Lv '+UNLOCK.lv+' · 주민 '+UNLOCK.pop+'</span>':'')+'</button>'};
+    (lock?'<span class="lock">'+(S.unlocked?'🔒 '+DEFS[pubNext()].nm+' 먼저':'Lv '+UNLOCK.lv+' · 주민 '+UNLOCK.pop)+'</span>':'')+'</button>'};
   {const lk=t=>t!=="road"&&!!DEFS[t]&&isLocked(t);const ok=t=>t==="road"||(!isLocked(t)&&(DEFS[t].deco?(S.items[DEFS[t].deco]||0)>=DEFS[t].cost:afford(costOf(t))));const L=tcatList(TRAYCAT).map((t,i)=>[t,i]).sort((a,b)=>(lk(b[0])?0:1)-(lk(a[0])?0:1)||(ok(b[0])?1:0)-(ok(a[0])?1:0)||a[1]-b[1]).map(x=>x[0]);
     const card=t=>{if(t==="road")return '<button class="card'+(tool==="road"?" on":"")+(pulseOn==="road"?" pulse":"")+'" data-t="road" title="끌어서 길을 깔아요"><img src="assets/t_dirt.webp" alt="" style="height:30px;margin:9px 0"><span class="nm">길</span><span class="cost">'+COIN.replace('class="ico"','')+ROAD_COST+' / 칸</span></button>';
       const d=DEFS[t];if(d.deco){const lack=(S.items[d.deco]||0)<d.cost;return '<button class="card'+(tool===t?" on":"")+(lack?" poor":"")+'" data-t="'+t+'" title="'+d.nm+'"><img src="assets/'+t+'.webp" alt=""><span class="nm">'+d.nm+'</span><span class="cost">'+ic(d.deco,14)+' '+d.cost+'</span></button>'}return bcard(t)};
@@ -963,7 +972,7 @@ $("tcats").addEventListener("click",e=>{const b=e.target.closest("button");if(!b
 $("tray").addEventListener("pointerdown",e=>{const b=e.target.closest(".card");if(!b||b.dataset.t==="road"||b.dataset.t==="deco"||b.dataset.t==="back"||b.dataset.t==="folk")return;trayDrag={t:b.dataset.t,x:e.clientX,y:e.clientY,id:e.pointerId,pt:e.pointerType}});
 document.addEventListener("pointermove",e=>{if(!trayDrag||trayDrag.id!==e.pointerId)return;const dx=e.clientX-trayDrag.x,dy=e.clientY-trayDrag.y;
   if(dy<-14&&Math.abs(dy)>Math.abs(dx)){const t=trayDrag.t;trayDrag=null;traySuppress=true;
-    if(isLocked(t)){toast("이장 Lv "+UNLOCK.lv+", 주민 "+UNLOCK.pop+"명이 되면 열려요.");return}
+    if(isLocked(t)){toast(lockMsg(t));return}
     if(DEFS[t].deco&&(S.items[DEFS[t].deco]||0)<DEFS[t].cost){toast(ITEMS[DEFS[t].deco].nm+"이(가) 부족해요. 이달의 행사에서 모아요.");return}
     if(S.tut===0&&t!=="house"){toast("어르신 말씀대로 먼저 집을 지어 보세요.");return}
     if(S.tut===1&&t!=="lumber"&&t!=="house"){toast("먼저 숲 옆에 벌목장을 지어 보세요.");return}
@@ -975,7 +984,7 @@ $("tray").addEventListener("click",e=>{if(traySuppress){traySuppress=false;retur
   if(t==="back"){trayMode=null;setTool(null);$("tray").scrollLeft=0;return}
   if(DEFS[t]&&DEFS[t].deco&&(S.items[DEFS[t].deco]||0)<DEFS[t].cost){toast(ITEMS[DEFS[t].deco].nm+"이(가) "+(DEFS[t].cost-(S.items[DEFS[t].deco]||0))+"개 더 필요해요. 이달의 행사에서 모아요.");return}
   if(t==="road"){if(S.tut<2){toast("어르신 말씀대로 먼저 해 보세요.");return}setTool(tool==="road"?null:"road");return}
-  if(isLocked(t)){toast("이장 Lv "+UNLOCK.lv+", 주민 "+UNLOCK.pop+"명이 되면 열려요.");return}
+  if(isLocked(t)){toast(lockMsg(t));return}
   if(S.tut===0&&t!=="house"){toast("어르신 말씀대로 먼저 집을 지어 보세요.");return}
   if(S.tut===1&&t!=="lumber"&&t!=="house"){toast("먼저 숲 옆에 벌목장을 지어 보세요.");return}
   if(tool===t){setTool(null);return}if(!afford(costOf(t)))toast(lackMsg(costOf(t)));setTool(t)});
@@ -997,7 +1006,8 @@ function drawHovB(){if(!HOVB||tool||ghost)return;if(HOVB.until&&Date.now()>HOVB.
   ctx.save();ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle="rgba(255,214,90,.16)";ctx.fill();ctx.lineWidth=Math.max(2,3.5*z);ctx.strokeStyle="rgba(255,196,40,.95)";ctx.setLineDash([10*z,6*z]);ctx.stroke();ctx.restore()}
 function hitBuilding(sx,sy,touch){const list=bList();const tp=touch?10:0;
   for(let i=TAGHITS.length-1;i>=0;i--){const t=TAGHITS[i];if(sx>=t.x0-tp&&sx<=t.x1+tp&&sy>=t.y0-tp&&sy<=t.y1+tp){const x=list.find(z=>z.k===t.k);if(x){x.__solid=true;return x}}}
-  {const t=pick(sx,sy);if(t)for(const x of list){const n=x.n||1;if(t.r>=x.r&&t.r<x.r+n&&t.c>=x.c&&t.c<x.c+n){x.__solid=true;return x}}}
+  {const t=pick(sx,sy);if(t){for(const x of list){const n=x.n||1;if(t.r>=x.r&&t.r<x.r+n&&t.c>=x.c&&t.c<x.c+n){x.__solid=true;return x}}
+    if(t.r>=0&&t.c>=0&&t.r<N&&t.c<N&&!S.roads[t.r+","+t.c]&&terr(t.r,t.c)!=="w")return null}}
   const pass=pp=>{let best=null;for(const x of list){const R=RECTS[x.k];if(!R)continue;if(solidAt(R,sx,sy,pp)){const d=x.r+x.c+2*((x.n||1)-1);if(!best||d>best.d)best={x,d}}}return best&&best.x};
   let hb=pass(4);if(hb){hb.__solid=true;return hb}
   if(touch){hb=pass(16);if(hb){hb.__solid=false;return hb}}
@@ -1867,7 +1877,7 @@ function markKnown(t){if(!S.knownB||!t)return;if(t==="folk"){coachHide();return}
 function newbList(){if(!S||!S.knownB)return [];return availBuilds().filter(t=>!S.knownB.includes(t))}
 let COACH=null;
 function coachHide(){COACH=null;const c=$("coach");if(c)c.hidden=true}
-function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
+function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof pubTick==="function")pubTick();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
   const nb=newbList();if(!nb.length){el.hidden=true;return}const here=t=>!!document.querySelector('#tray .card[data-t="'+t+'"]');const t=nb.find(here)||nb[0];
   let target=null,txt="";
   if(here(t)){target=document.querySelector('#tray .card[data-t="'+t+'"]');txt="새로 지을 수 있어요: "+DEFS[t].nm+"! 여기를 눌러 보세요 👇"}
@@ -1960,6 +1970,7 @@ function festEnd(score){const U=u3(),k=S.year+"-"+S.month;let rw="";if(U.festM!=
   modal("축제가 끝났어요! 🎉",'<p style="text-align:center;font-size:20px"><b>점수 '+score+' / 8</b></p><p>나라마다 집, 음식, 옷, 말이 서로 달라요. 다르다고 이상한 것이 아니라, 각자의 환경과 생활에 맞게 생겨난 소중한 문화예요. 서로의 문화를 존중하면 모두가 행복한 마을이 돼요.</p>'+(rw?'<p class="fine">'+rw+'</p>':''),[{t:"좋아요!"}]);sfx("level");save();update()}
 /* ---------- 벌목장 업그레이드 + 숲 개간·나무 심기 ---------- */
 let LUM3F=1.15;const LUMB=[{nm:"벌목장",rate:1,cap:15},{nm:"큰 벌목장",rate:1.5,cap:25,lv:4,m:40,w:0,tip:"나무가 1.5배 빨리, 25개까지 쌓여요"},{nm:"제재소",rate:2,cap:40,lv:7,m:90,w:20,tip:"나무가 2배 빨리, 40개까지 쌓이고 가득 차면 절반을 저절로 거둬요"}];
+function lumRate(x){return Math.min(3,adjForest(x.r,x.c))+(nearMount(x.r,x.c,2)?1:0)}
 function lumLv(B){return Math.max(1,Math.min(3,B.lv||1))}
 function tovOf(r,c){return S&&S.tov&&S.tov[r+","+c]}
 function isForestT(r,c){return T[r][c]==="f"&&!tovOf(r,c)}
@@ -1983,7 +1994,7 @@ function plantModal(r,c){const k=r+","+c;
       S.happy=Math.min(100,S.happy+1);gainXP(5);if(!S.notes.includes("plant"))addNote("plant");sfx("good");toast("묘목을 심었어요! 3달 뒤 숲이 돼요");save();update()}}])}
 function growSaplings(){if(!S.tov)return;let n=0;for(const k in S.tov){if(S.tov[k]==="sap"&&S.seasonsTotal-((S.sap&&S.sap[k])||0)>=3){delete S.tov[k];if(S.sap)delete S.sap[k];n++}}if(n){connDirty=true;tlAdd("심은 나무가 자라 숲이 되었어요");toast("심은 묘목이 자라 다시 숲이 되었어요! 🌳")}}
 function lumberInfo(x,el){const B=S.b[x.k],lv=lumLv(B),L=LUMB[lv-1],nx=LUMB[lv];
-  el.insertAdjacentHTML("beforeend",'<div class="fine" style="margin-top:6px">지금: <b>'+L.nm+'</b> · 나무 최대 '+L.cap+'개 · 옆 숲 '+adjForest(x.r,x.c)+'칸</div>');
+  el.insertAdjacentHTML("beforeend",'<div class="fine" style="margin-top:6px">지금: <b>'+L.nm+'</b> · 나무 최대 '+L.cap+'개 · 옆 숲 '+adjForest(x.r,x.c)+'칸</div>'+(lumRate(x)<=0?'<div class="fine" style="margin-top:4px;color:#c8503b">🌲 바로 옆에 숲이 없어서 나무가 안 나와요. 숲 바로 옆으로 옮기거나, 옆 빈터에 나무를 심어 보세요.</div>':''));
   if(nx&&!B.building){const lvOk=S.level>=nx.lv,ok=lvOk&&afford(nx);el.insertAdjacentHTML("beforeend",'<button class="up" id="lupb" style="margin-top:6px"><img src="assets/'+(lv===1?"lumber2":"lumber3")+'.webp" alt=""><span class="t"><b>'+nx.nm+'로 바꾸기</b><span>'+nx.tip+'</span><span class="need '+(lvOk?"ok":"no")+'">'+(lvOk?"✓ ":"✗ ")+'이장 Lv '+nx.lv+'</span><span class="need '+(afford(nx)?"ok":"no")+'">돈 '+nx.m+(nx.w?' · 나무 '+nx.w:'')+'</span></span></button>');
     $("lupb").onclick=()=>{if(!lvOk){toast("이장 Lv "+nx.lv+"이 되면 바꿀 수 있어요");return}if(!afford(nx)){toast(lackMsg(nx));return}spend(nx);S.b[x.k].lv=lv+1;sfx("build");gainXP(15);toast(nx.nm+"로 바꾸었어요!");floats.push({r:x.r,c:x.c,txt:nx.nm+"!",t0:tAnim});save();update();showInfo({...x,...S.b[x.k]})}}
   else if(!nx)el.insertAdjacentHTML("beforeend",'<div class="fine">가장 큰 벌목장이에요!</div>')}
@@ -2003,7 +2014,7 @@ function rangeShow(){let t=null,r,c,n;if(ghost&&RANGE[ghost.type]){t=ghost.type;
   else if(tool&&RANGE[tool]&&hover){const o=toolOrigin();if(o){t=tool;r=o.r;c=o.c;n=DEFS[tool].n}}
   else if(sel&&RANGE[sel.type]){t=sel.type;r=sel.r;c=sel.c;n=sel.n||1}
   return t?{t,r,c,n,R:RANGE[t]}:null}
-function covTip(){if(!S||S.covV||S.tut<4)return;S.covV=1;S.covGrace=S.seasonsTotal+1;save();
+function covTip(){if(!S||S.covV||S.tut<4||(S.unlocked&&!pubDone()))return;S.covV=1;S.covGrace=S.seasonsTotal+1;save();
   say("이장님, 요즘 마을 끝 동네 주민들이 '놀이터랑 병원이 너무 멀어요' 하고 불편해한다네. 공공시설은 가까운 곳에만 도움을 줄 수 있어. 시설을 고르면 바닥에 초록색으로 도움이 닿는 범위가 보이니, 동네마다 필요한 시설을 지어 주게. 이번 한 달은 주민들이 기다려 준다네.",null,"elder","w")}
 /* ---------- 마을 사진 찍기 ---------- */
 let CAPTURE=false;
@@ -2059,7 +2070,7 @@ function plDevButtons(){const day=plDay(),m=+plGet("ijang-limit",PL_DEF);return[
   {t:"하루 제한 바꾸기 (지금 "+(m?m+"분":"제한 없음")+")",ghost:true,keep:true,f:()=>{const L=[30,60,90,0],nx=L[(L.indexOf(m)+1)%L.length];plSet("ijang-limit",nx);toast("이 기기의 하루 제한: "+(nx?nx+"분":"제한 없음"));devPanel()}}]}
 
 /* ---------- 마을 자랑하기 게시판 (일주일 전시 · 고르는 자랑 문장 · 응원 스티커) ---------- */
-const CHEERS=[["👏","멋져요"],["❤️","살고 싶어요"],["🌟","최고예요"]];
+const CHEERS=[["👍","좋아요"],["👏","멋져요"],["😍","부러워요"]];
 const BOAST_DAYS=7,BOAST_KEEP=14,DAYMS=86400000;
 const BOAST_PH=[
   ["intro","🏡 우리 마을을 소개해요!",()=>true],
@@ -2089,20 +2100,27 @@ function boastOpen(){if(!ACCT.db){modal("마을 자랑하기",'<p>마을 자랑�
   if(!ACCT.id){modal("마을 자랑하기",'<p>아이디로 들어와야 자랑할 수 있어요. 오른쪽 위 저장 버튼에서 아이디로 들어와 주세요.</p>',[{t:"닫기"}]);return}
   const me=ACCT.uid||ACCT.id;let posts=[],cheers=[],picks=[];const prof=bProf();
   const myOk=BOAST_PH.filter(p=>{try{return p[2]()}catch(e){return false}});
-  const cardHTML=(p,cnt,mine,small)=>{const left=Math.max(1,Math.ceil((p.at+BOAST_DAYS*DAYMS-Date.now())/DAYMS));const own=p.uid===me;
-    return '<div class="bpost'+(small?" bsmall":"")+'"><img src="'+p.img+'" alt="친구 마을 사진" loading="lazy"><div class="bmeta"><b>'+escH(p.school||"")+' '+escH(p.year?p.year+"학년":"")+' · '+escH(p.nick||"이장님")+'</b>'+
-      '<span class="btags">'+(p.texts||[]).map(id=>BPH[id]?'<i>'+BPH[id]+'</i>':'').join("")+'</span><span class="fine">'+escH(p.vgrade||"")+' · 주민 '+(p.pop||0)+'명'+(small?'':' · <b class="bdday">D-'+left+'</b>')+'</span></div>'+
-      (small?'<div class="bcheers"><span class="fine">응원 '+(cnt[p.id]||0)+'개</span></div>':'<div class="bcheers">'+CHEERS.map(([e,t],i)=>{const k=p.id+"|"+i;return '<button data-p="'+p.id+'" data-k="'+i+'" class="'+(mine.has(k)?"on":"")+'"'+(own?" disabled":"")+'>'+e+' '+t+' <i>'+(cnt[k]||0)+'</i></button>'}).join("")+
-      (own?'<button class="ghost bdel" data-mine="'+p.id+'">내 자랑 내리기</button>':'')+(DEV&&!own?'<button class="bdel" data-del="'+p.id+'">선생님: 내리기</button>':'')+'</div>')+'</div>'};
+  let openId=null;
+  const who=p=>escH(p.school||"")+' '+escH(p.year?p.year+"학년":"")+' · '+escH(p.nick||"이장님");
+  const thumb=(p,cnt)=>'<button class="bthumb" data-open="'+p.id+'"><img src="'+p.img+'" alt="친구 마을 사진" loading="lazy"><span class="bt-n">'+who(p)+'</span><span class="bt-c">'+(p.uid===me?'⭐ 내 자랑 · ':'')+'응원 '+(cnt[p.id]||0)+'</span></button>';
+  const detail=(p,cnt,mine)=>{const left=Math.max(1,Math.ceil((p.at+BOAST_DAYS*DAYMS-Date.now())/DAYMS)),own=p.uid===me,old=Date.now()-p.at>=BOAST_DAYS*DAYMS;
+    return '<div class="bdetail"><button class="ghost" id="bback">← 목록으로</button><img src="'+p.img+'" alt="친구 마을 사진"><div class="bmeta"><b>'+who(p)+'</b>'+
+      '<span class="btags">'+(p.texts||[]).map(id=>BPH[id]?'<i>'+BPH[id]+'</i>':'').join("")+'</span><span class="fine">'+escH(p.vgrade||"")+' · 주민 '+(p.pop||0)+'명'+(old?' · 지난주 인기 마을':' · <b class="bdday">D-'+left+'</b>')+'</span></div>'+
+      '<div class="bcheers big">'+CHEERS.map(([e,t],i)=>{const k=p.id+"|"+i;return '<button data-p="'+p.id+'" data-k="'+i+'" class="'+(mine.has(k)?"on":"")+'"'+(own||old?" disabled":"")+'>'+e+' '+t+' <i>'+(cnt[k]||0)+'</i></button>'}).join("")+'</div>'+
+      (own?'<p class="fine">내 자랑이에요. 친구들이 보낸 응원이 숫자로 보여요.</p><button class="ghost bdel" data-mine="'+p.id+'">내 자랑 내리기</button>':'')+(DEV&&!own?'<button class="bdel" data-del="'+p.id+'">선생님: 내리기</button>':'')+'</div>'};
   const render=()=>{if($("veil").hidden||!$("bwall"))return;const now=Date.now(),cnt={},mine=new Set();
     cheers.forEach(c=>{const k=c.post+"|"+c.kind;cnt[k]=(cnt[k]||0)+1;cnt[c.post]=(cnt[c.post]||0)+1;if(c.by===me)mine.add(k)});
     const vis=posts.filter(p=>!p.hidden),cur=vis.filter(p=>now-p.at<BOAST_DAYS*DAYMS),old=vis.filter(p=>now-p.at>=BOAST_DAYS*DAYMS&&now-p.at<BOAST_KEEP*DAYMS).filter(p=>(cnt[p.id]||0)>0).sort((a,b)=>(cnt[b.id]||0)-(cnt[a.id]||0)).slice(0,3);
-    $("bwall").innerHTML=(old.length?'<h4 style="margin:4px 0">🏅 지난주 인기 마을</h4><div class="bhof">'+old.map(p=>cardHTML(p,cnt,mine,true)).join("")+'</div><h4 style="margin:10px 0 4px">이번 주 자랑</h4>':'')+
-      (cur.length?cur.map(p=>cardHTML(p,cnt,mine,false)).join(""):'<p class="fine" style="text-align:center;padding:20px">이번 주에 자랑한 마을이 아직 없어요. 첫 번째로 자랑해 보세요!</p>');
+    const op=openId&&vis.find(p=>p.id===openId);
+    if(op)$("bwall").innerHTML=detail(op,cnt,mine);
+    else{openId=null;$("bwall").innerHTML=(old.length?'<h4 style="margin:4px 0">🏅 지난주 인기 마을</h4><div class="bgrid">'+old.map(p=>thumb(p,cnt)).join("")+'</div>':'')+'<h4 style="margin:10px 0 4px">이번 주 자랑 '+cur.length+'개 <span class="fine">· 누르면 크게 보고 응원할 수 있어요</span></h4>'+
+      (cur.length?'<div class="bgrid">'+cur.map(p=>thumb(p,cnt)).join("")+'</div>':'<p class="fine" style="text-align:center;padding:20px">이번 주에 자랑한 마을이 아직 없어요. 첫 번째로 자랑해 보세요!</p>')}
+    $("bwall").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{openId=b.dataset.open;sfx("click");render();$("bwall").scrollTop=0;$("bwall").scrollIntoView({block:"nearest"})});
+    if($("bback"))$("bback").onclick=()=>{openId=null;render()};
     $("bwall").querySelectorAll("[data-k]").forEach(b=>b.onclick=async()=>{const id=b.dataset.p+"_"+me+"_"+b.dataset.k;const ref=ACCT.db.collection("cheers").doc(id);b.disabled=true;
       try{if(b.classList.contains("on"))await ref.delete();else{await ref.set({post:b.dataset.p,kind:+b.dataset.k,by:me,at:Date.now(),expireAt:bExpire(Date.now())});sfx("good")}}catch(e){toast("지금은 응원을 보낼 수 없어요")}b.disabled=false});
     $("bwall").querySelectorAll("[data-mine],[data-del]").forEach(b=>b.onclick=async()=>{if(!b.dataset.sure){b.dataset.sure=1;b.textContent="정말 내릴까요? 한 번 더 눌러요";return}
-      try{await ACCT.db.collection("boast").doc(b.dataset.mine||b.dataset.del).delete();toast("자랑을 내렸어요")}catch(e){toast("내리지 못했어요")}})};
+      try{await ACCT.db.collection("boast").doc(b.dataset.mine||b.dataset.del).delete();openId=null;toast("자랑을 내렸어요")}catch(e){toast("내리지 못했어요")}})};
   const phHTML=()=>myOk.map(p=>'<button class="bph'+(picks.includes(p[0])?" on":"")+'" data-ph="'+p[0]+'">'+p[1]+'</button>').join("")+(myOk.length<BOAST_PH.length?'<span class="fine">마을을 더 가꾸면 자랑할 거리가 '+(BOAST_PH.length-myOk.length)+'개 더 열려요</span>':'');
   const today=ymd(Date.now()),posted=(()=>{try{return localStorage.getItem("ijang-bday-"+me)===today}catch(e){return false}})();
   $("modal").innerHTML='<button class="mclose" id="bx" aria-label="닫기">✕ 닫기</button><h2>📸 마을 자랑하기</h2>'+
@@ -2187,6 +2205,7 @@ function bar(v,m){return '<span class="tr"><i style="width:'+Math.round(Math.min
 function goPulse(t,folk){return()=>{$("veil").hidden=true;trayMode=null;if(t==="folk")TRAYCAT="old";pulse(t)}}
 function chapter(){const H=S.h2||{},T=S.trans||{},B=S.bong||{},U=S.u3||{};
   // 1 마을 짓기
+  if(S.unlocked&&!pubDone()){const nx=pubNext();return{i:0,t:"공공기관을 하나씩 지어요. 지금은 "+DEFS[nx].nm+"을(를) 지을 차례예요 ("+PUBSEQ.filter(t=>bList().some(x=>x.type===t)).length+"/4)",hint:"경찰서 → 소방서 → 병원 → 학교 순서로 열려요.",go:{t:DEFS[nx].nm+" 찾기",f:goPulse(nx,false)}}}
   if(!S.unlocked||(S.grade||0)<1){const need=[["이장 Lv "+UNLOCK.lv,Math.min(S.level,UNLOCK.lv),UNLOCK.lv],["주민 "+UNLOCK.pop+"명",Math.min(pop(),UNLOCK.pop),UNLOCK.pop]];
     return{i:0,t:S.unlocked?"마을 등급 '마을'이 되도록 집을 늘려요":"집을 짓고 주민을 늘려 공공기관(학교·병원 등)을 열어요",bars:need,hint:"집 → 벌목장 → 길 잇기 → 다음 달. 주민 소원을 들어주면 레벨이 빨리 올라요."}}
   // 2 옛이야기
@@ -2272,7 +2291,7 @@ function happyExtra(){let e=0;if(count("museum"))e+=3;e+=Math.min(3,count("recyc
 function bigTown(){return Math.min(10,Math.floor(pop()/50)*2)}
 /* 작은 사건 */
 const MEV={trash:{ico:"🗑️",t:"쓰레기 치우기",msg:"쓰레기가 쌓여 냄새가 나요!",types:null,fix:"쓰레기를 치웠어요",need:"recycle",m:20,w:0,tip:"분리수거장이 있으면 돈 없이 치워요"},
-  broke:{ico:"🔧",t:"놀이기구 고장",msg:"놀이기구가 고장 났어요!",types:["playground","park"],fix:"놀이기구를 고쳤어요",need:null,m:20,w:8,tip:"돈과 나무로 고쳐요"}};
+  broke:{ico:"🔧",t:"놀이기구 고장",msg:"놀이기구가 고장 났어요!",types:["playground","dinopark"],fix:"놀이기구를 고쳤어요",need:null,m:20,w:8,tip:"돈과 나무로 고쳐요"}};
 function evAt(k){if(S.mev&&!MEV[S.mev.id])S.mev=null;return S.mev&&S.mev.k===k?MEV[S.mev.id]:null}
 function mevMonth(){if(S.mev&&!MEV[S.mev.id])S.mev=null;if(S.mev){if(!S.b[S.mev.k])S.mev=null;else return}if((S.tut||0)<4||pop()<15||Math.random()>.35)return;
   const ids=Object.keys(MEV).sort(()=>Math.random()-.5);for(const id of ids){const E=MEV[id];const c=bList().filter(x=>!x.building&&isConn(x)&&(E.types?E.types.includes(x.type):isHouse(x)&&(x.occ||0)>0));
@@ -2322,7 +2341,7 @@ function devOpen(){if(DEV){devPanel();return}
 function devPanel(){modal("개발자 모드 켜짐",'<ul><li>돈과 나무가 줄지 않아요</li><li>다음 달을 기다리지 않고 넘길 수 있어요</li><li>공사가 바로 끝나요</li></ul>',[
   {t:"레벨 올리기",ghost:true,keep:true,f:()=>{setTimeout(save,50);gainXP((LV[S.level]||S.xp+100)-S.xp);update()}},
   {t:"모든 땅 열기",ghost:true,keep:true,f:()=>{setTimeout(save,50);S.zone=ZONES.length-1;connDirty=true;update()}},
-  {t:"공공기관 열기",ghost:true,keep:true,f:()=>{setTimeout(save,50);if(!S.unlocked){S.unlocked=true;S.unlockSeason=S.seasonsTotal}update()}},
+  {t:"공공기관 열기",ghost:true,keep:true,f:()=>{setTimeout(save,50);if(!S.unlocked){S.unlocked=true;S.pubSeq=1;S.unlockSeason=S.seasonsTotal}update()}},
   {t:"받은 의견 보기",ghost:true,keep:true,f:()=>fbList()},
   {t:"3-1-2 바로 열기",ghost:true,keep:true,f:()=>{setTimeout(save,50);S.unlocked=true;if(S.level<7){S.xp=LV[6];S.level=7}h2Check(true);$("veil").hidden=true;update()}},
   {t:"다음 단원 바로 열기 (시간 다리)",ghost:true,keep:true,f:()=>{setTimeout(save,50);if(folkOpen_()){toast("이미 열렸어요");return}$("veil").hidden=true;folkOpen(true)}},
@@ -2497,8 +2516,8 @@ function acctInfo(){
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){save();if(ACCT.ref)cloudSave(true)}});
 window.addEventListener("pagehide",()=>{save();if(ACCT.ref)cloudSave(true)});
 setInterval(()=>{if(S&&$("acct").hidden)save()},20000);
-function migrate(){if(!S.tl){S.tl=[{y:1,m:3,t:"마을이 생겼어요"}]}S.grade=S.grade||0;if(S.month==null)S.month=[3,6,9,12][S.season||0];S.season=SEASON_OF(S.month);S.items=S.items||{};S.evDone=S.evDone||{};Object.values(S.b).forEach(b=>{if(b.type==="hospital")b.n=1});{const H=S.b["17,16"];if(H&&H.type==="hall"&&!["16,15","16,16","17,15"].some(k=>S.b[k]||T[+k.split(",")[0]][+k.split(",")[1]]!=="g"||Object.values(S.b).some(()=>false))){let free=true;for(const x of bList()){if(x.k==="17,16")continue;const n=x.n||1;for(const [rr,cc] of [[16,15],[16,16],[17,15]])if(rr>=x.r&&rr<x.r+n&&cc>=x.c&&cc<x.c+n)free=false}if(free&&!(S.roads&&(S.roads["16,15"]||S.roads["16,16"]||S.roads["17,15"]))){delete S.b["17,16"];S.b["16,15"]={...H,n:2}}}}S.happy=calcHappy();}
-function afterLogin(){setTimeout(()=>{if(typeof checkUnlock==="function"){checkUnlock();update()}},1500);newbInit();setTimeout(()=>{if(typeof bongHint==="function"&&$("elder").hidden&&$("veil").hidden)bongHint()},9000);setTimeout(()=>{if(typeof noriHint==="function")noriHint()},4000);if(S.unlocked&&!S.conds)setTimeout(()=>say("이장님, 하나 묻겠네. 이장님이 생각하는 살기 좋은 마을은 어떤 마을인가?",()=>condPick(true)),2500);S.happy=calcHappy();updAcct();updSnd();setTimeout(sndAsk,400);setTool(null);sel=null;$("info").hidden=true;update();intro();setTimeout(()=>{if($("elder").hidden&&$("veil").hidden)evNotice()},1200)}
+function migrate(){if(S.unlocked&&!S.pubSeq)S.pubAll=1;if(!S.tl){S.tl=[{y:1,m:3,t:"마을이 생겼어요"}]}S.grade=S.grade||0;if(S.month==null)S.month=[3,6,9,12][S.season||0];S.season=SEASON_OF(S.month);S.items=S.items||{};S.evDone=S.evDone||{};Object.values(S.b).forEach(b=>{if(b.type==="hospital")b.n=1});{const H=S.b["17,16"];if(H&&H.type==="hall"&&!["16,15","16,16","17,15"].some(k=>S.b[k]||T[+k.split(",")[0]][+k.split(",")[1]]!=="g"||Object.values(S.b).some(()=>false))){let free=true;for(const x of bList()){if(x.k==="17,16")continue;const n=x.n||1;for(const [rr,cc] of [[16,15],[16,16],[17,15]])if(rr>=x.r&&rr<x.r+n&&cc>=x.c&&cc<x.c+n)free=false}if(free&&!(S.roads&&(S.roads["16,15"]||S.roads["16,16"]||S.roads["17,15"]))){delete S.b["17,16"];S.b["16,15"]={...H,n:2}}}}S.happy=calcHappy();}
+function afterLogin(){if(S&&!S.startBonus){S.startBonus=1;S.money+=100;save();setTimeout(()=>say("이장님, 마을 지원금이 나왔다네! 돈 +100. 마을을 더 멋지게 가꿔 보게.",null,"elder","h"),3500)}setTimeout(()=>{if(typeof checkUnlock==="function"){checkUnlock();update()}},1500);newbInit();setTimeout(()=>{if(typeof bongHint==="function"&&$("elder").hidden&&$("veil").hidden)bongHint()},9000);setTimeout(()=>{if(typeof noriHint==="function")noriHint()},4000);if(S.unlocked&&!S.conds&&pubDone())setTimeout(()=>say("이장님, 하나 묻겠네. 이장님이 생각하는 살기 좋은 마을은 어떤 마을인가?",()=>condPick(true)),2500);S.happy=calcHappy();updAcct();updSnd();setTimeout(sndAsk,400);setTool(null);sel=null;$("info").hidden=true;update();intro();setTimeout(()=>{if($("elder").hidden&&$("veil").hidden)evNotice()},1200)}
 function fbInit(){const cfg=window.FIREBASE_CONFIG;if(!cfg||!cfg.apiKey)return Promise.resolve(null);
   const load=src=>new Promise((res,rej)=>{const e=document.createElement("script");e.src=src;e.onload=res;e.onerror=rej;document.head.appendChild(e)});const B="https://www.gstatic.com/firebasejs/10.12.2/";
   return load(B+"firebase-app-compat.js").then(()=>Promise.all([load(B+"firebase-auth-compat.js"),load(B+"firebase-firestore-compat.js")])).then(()=>{if(!firebase.apps.length)firebase.initializeApp(cfg);return new Promise(r=>{const un=firebase.auth().onAuthStateChanged(u=>{un();r(u)})}).then(u=>u?{user:u}:firebase.auth().signInAnonymously())})
