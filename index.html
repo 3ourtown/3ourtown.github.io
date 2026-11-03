@@ -294,6 +294,33 @@ canvas#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;dis
   .side #bookcount,.side #nextlbl,.side #evlbl{font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
   #evbtn .evdot{top:3px;right:4px;width:7px;height:7px}
 }
+/* 가로로 든 휴대폰(높이가 낮은 화면): 위·아래를 얇게, 맵을 넓게 */
+@media (max-height:500px){
+  .hud{flex-wrap:nowrap;gap:6px;padding-block:3px}
+  .brand{display:none}
+  .stats{flex-wrap:nowrap;overflow-x:auto;gap:4px;order:0;flex-basis:auto;scrollbar-width:none}.stats::-webkit-scrollbar{display:none}
+  .chip{padding:1px 7px;font-size:13px;gap:3px;border-radius:8px}.chip .k{display:none}.chip img,.chip .ico{width:16px;height:16px}
+  #gchip{display:none}.tdchip b{display:none}
+  .level{gap:4px}.level b{font-size:12px;padding:1px 6px}.xpbar{width:36px!important}.bdg{height:20px}
+  .acctbtn{padding:2px 7px;font-size:11px}
+  .bottom{padding-block:3px;gap:6px}
+  .traywrap{gap:2px}.tcats button{padding:1px 9px;font-size:12px}
+  .card{display:grid;grid-template-columns:46px auto;grid-auto-rows:auto;column-gap:5px;row-gap:0;align-content:center;justify-items:start;width:auto;min-width:112px;padding:2px 9px 2px 4px;text-align:left}
+  .card.on{padding:1px 8px 1px 3px}
+  .card>img{grid-row:1/span 3;width:46px;height:38px!important;margin:0!important;align-self:center}
+  .card .nm{font-size:13px}
+  .side{flex-direction:row;width:auto;flex:0 0 auto;gap:4px}
+  .side button{flex-direction:column;width:56px;gap:1px;padding:2px 3px;font-size:10.5px}
+  .side #bookcount,.side #nextlbl,.side #evlbl{font-size:10.5px}
+  .side svg{width:16px;height:16px}
+  .mini canvas{width:110px;height:58px}
+  .compass{width:40px;height:40px}.zoom{flex-direction:row}.zoom button{width:32px;height:32px;font-size:18px}.tools{gap:5px;top:6px}
+  .arrow{width:38px;height:38px;font-size:10px}.arrow svg{width:14px;height:14px}.ar-n{top:4px}.ar-s{bottom:4px}
+  .wishes{top:6px;gap:4px;width:min(250px,40%)}.wish img{width:42px;height:42px;border-width:2px}.wish p{font-size:12.5px}.wish .wb{padding:4px 8px 5px}.wishes h3{font-size:12px}
+  .elder{bottom:0;max-width:min(560px,calc(100% - 16px))}.elder img{height:120px}.elder .bubble{margin-bottom:24px;font-size:13.5px;padding:7px 10px}
+  .info{bottom:6px;max-height:calc(100% - 12px);overflow:auto}
+  .toolhint{bottom:6px}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
