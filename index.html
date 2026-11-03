@@ -26,7 +26,7 @@
   --font:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
   color-scheme:light;
 }
-[hidden]{display:none!important}#plblock{position:fixed;inset:0;z-index:200;background:rgba(20,30,45,.82);display:flex;align-items:center;justify-content:center;padding:16px}.plcard{background:var(--paper);border-radius:18px;padding:28px 24px;max-width:380px;text-align:center;box-shadow:0 10px 40px #0005}.plcard h2{margin:8px 0}.plcard p{line-height:1.6}.plcard .linkb{margin-top:14px;opacity:.55;font-size:12px}
+[hidden]{display:none!important}#bzoom{position:fixed;inset:0;z-index:150;background:#141a17;display:flex;flex-direction:column}.bzbar{display:flex;gap:8px;align-items:center;justify-content:center;padding:10px;color:#fff}.bzbar b{min-width:44px;text-align:center}.bzbar button{min-width:44px;font-size:18px}.bzbar button{background:#fff;color:#222;border:none;border-radius:10px;padding:6px 12px}.bzbar #bzx{font-size:14px;margin-left:12px}.bzwrap{flex:1;overflow:auto;touch-action:pan-x pan-y;display:block;padding:0 8px 12px;cursor:grab}.bzwrap img{width:100%;display:block;margin:0 auto;user-select:none;-webkit-user-drag:none}.bzimg{cursor:zoom-in}#plblock{position:fixed;inset:0;z-index:200;background:rgba(20,30,45,.82);display:flex;align-items:center;justify-content:center;padding:16px}.plcard{background:var(--paper);border-radius:18px;padding:28px 24px;max-width:380px;text-align:center;box-shadow:0 10px 40px #0005}.plcard h2{margin:8px 0}.plcard p{line-height:1.6}.plcard .linkb{margin-top:14px;opacity:.55;font-size:12px}
 #acctbtn{position:relative;overflow:visible}#acctbtn.saved{box-shadow:0 0 0 2px #5fae7f}#acctbtn.saved::after{content:"저장됨 ✓";position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:3px;background:#2f7a55;color:#fff;font-size:11px;border-radius:999px;padding:1px 7px;white-space:nowrap;pointer-events:none;z-index:5}
 button,.card,.brand{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .fbar{margin:8px 0}.fbar>div{display:flex;justify-content:space-between;font-size:14px;margin-bottom:3px}.fbar i{display:block;height:10px;border-radius:999px;background:linear-gradient(90deg,#e9a92c,#f3c96a);box-shadow:inset 0 0 0 1px #0001}.fbar .tr{display:block;background:#efe5cf;border-radius:999px;overflow:hidden}.fbar.ok i{background:linear-gradient(90deg,#2f7a55,#5fae7f)}
@@ -2024,10 +2024,9 @@ function snapVillage(maxW,anon){const bs=bList();let r0=99,r1=-1,c0=99,c1=-1;bs.
   const pts=[wpos(r0,c0),wpos(r0,c1),wpos(r1,c1),wpos(r1,c0)],minX=Math.min(...pts.map(p=>p.x)),maxX=Math.max(...pts.map(p=>p.x)),minY=Math.min(...pts.map(p=>p.y))-TH*3,maxY=Math.max(...pts.map(p=>p.y));
   const sv={x:view.x,y:view.y,z:view.z},sh=hover,ss=sel;const z=Math.min(1.1,Math.min(W/(maxX-minX),H/(maxY-minY))*.95);
   view.z=z;view.x=W/2-(minX+maxX)/2*z;view.y=H/2-(minY+maxY)/2*z;hover=null;sel=null;CAPTURE=true;
-  let url=null;try{draw();const out=document.createElement("canvas"),sc=Math.min(1,(maxW||900)/W);out.width=Math.round(W*sc);out.height=Math.round(H*sc);const g=out.getContext("2d");g.drawImage(cv,0,0,out.width,out.height);
+  let url=null;try{draw();const out=document.createElement("canvas"),sc=Math.min(DPR,(maxW||900)/W);out.width=Math.round(W*sc);out.height=Math.round(H*sc);const g=out.getContext("2d");g.drawImage(cv,0,0,out.width,out.height);
     g.font="700 "+Math.round(16*sc+6)+"px "+FONT;g.fillStyle="rgba(255,250,240,.9)";const t=(!anon&&typeof ACCT!=="undefined"&&ACCT.nick?ACCT.nick+" 이장님의 ":"우리 ")+"마을 · "+GRADES[S.grade||0].nm+" · 주민 "+pop()+"명";const tw=g.measureText(t).width;
-    g.fillRect(10,10,tw+20,Math.round(16*sc+18));g.fillStyle="#2a2620";g.textBaseline="top";g.fillText(t,20,15);url=out.toDataURL("image/jpeg",.7);
-    if(url.length>240000)url=out.toDataURL("image/jpeg",.5);if(url.length>270000){const o2=document.createElement("canvas");o2.width=Math.round(out.width*.75);o2.height=Math.round(out.height*.75);o2.getContext("2d").drawImage(out,0,0,o2.width,o2.height);url=o2.toDataURL("image/jpeg",.55)}}catch(e){url=null}
+    g.fillRect(10,10,tw+20,Math.round(16*sc+18));g.fillStyle="#2a2620";g.textBaseline="top";g.fillText(t,20,15);let src=out;for(let k=0;k<6;k++){for(const q of [.75,.62,.5]){url=src.toDataURL("image/jpeg",q);if(url.length<=270000)break}if(url.length<=270000)break;const o2=document.createElement("canvas");o2.width=Math.round(src.width*.8);o2.height=Math.round(src.height*.8);o2.getContext("2d").drawImage(src,0,0,o2.width,o2.height);src=o2}}catch(e){url=null}
   CAPTURE=false;view.x=sv.x;view.y=sv.y;view.z=sv.z;hover=sh;sel=ss;return url}
 /* ---------- 마을 앨범 · 졸업장 ---------- */
 function albumItems(){const T=S.trans||{};return[
@@ -2092,7 +2091,19 @@ const BOAST_PH=[
   ["grad","🎓 졸업장을 받았어요",()=>!!S.grad]];
 const BPH=Object.fromEntries(BOAST_PH.map(p=>[p[0],p[1]]));
 let BOAST_UNSUB=[];
-function boastClose(){BOAST_UNSUB.forEach(f=>{try{f()}catch(e){}});BOAST_UNSUB=[]}
+function zoomView(src){let el=$("bzoom");if(!el){el=document.createElement("div");el.id="bzoom";document.body.appendChild(el)}
+  el.innerHTML='<div class="bzbar"><button id="bzm" aria-label="작게">－</button><b id="bzl">1배</b><button id="bzp" aria-label="크게">＋</button><button id="bzx" aria-label="닫기">✕ 닫기</button></div><div class="bzwrap" id="bzw"><img id="bzi" src="'+src+'" alt="크게 본 친구 마을" draggable="false"></div>';
+  el.hidden=false;let z=1;const w=$("bzw"),im=$("bzi");
+  const set=(nz,cx,cy)=>{nz=Math.max(1,Math.min(4,nz));const r=w.getBoundingClientRect();cx=cx==null?r.width/2:cx;cy=cy==null?r.height/2:cy;const fx=(w.scrollLeft+cx)/(im.offsetWidth||1),fy=(w.scrollTop+cy)/(im.offsetHeight||1);z=nz;im.style.width=(z*100)+"%";$("bzl").textContent=(Math.round(z*10)/10)+"배";w.scrollLeft=fx*im.offsetWidth-cx;w.scrollTop=fy*im.offsetHeight-cy};
+  $("bzp").onclick=()=>set(z+1);$("bzm").onclick=()=>set(z-1);$("bzx").onclick=()=>{el.hidden=true};
+  el.onclick=e=>{if(e.target===el||e.target===w)el.hidden=true};
+  im.ondblclick=e=>{const r=w.getBoundingClientRect();set(z>1?1:2,e.clientX-r.left,e.clientY-r.top)};
+  let drag=null;const pts=new Map();let pinch=null;
+  w.onpointerdown=e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){const [a,b]=[...pts.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),z};drag=null}else if(e.pointerType==="mouse"){drag={x:e.clientX,y:e.clientY,sl:w.scrollLeft,st:w.scrollTop};w.setPointerCapture(e.pointerId)}};
+  w.onpointermove=e=>{if(pts.has(e.pointerId))pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pinch&&pts.size===2){const [a,b]=[...pts.values()],r=w.getBoundingClientRect();set(pinch.z*Math.hypot(a.x-b.x,a.y-b.y)/pinch.d,(a.x+b.x)/2-r.left,(a.y+b.y)/2-r.top)}else if(drag){w.scrollLeft=drag.sl-(e.clientX-drag.x);w.scrollTop=drag.st-(e.clientY-drag.y)}};
+  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;drag=null};w.onpointerup=up;w.onpointercancel=up;
+  w.onwheel=e=>{{e.preventDefault();const r=w.getBoundingClientRect();set(z*(e.deltaY<0?1.15:1/1.15),e.clientX-r.left,e.clientY-r.top)}}}
+function boastClose(){if($("bzoom"))$("bzoom").hidden=true;BOAST_UNSUB.forEach(f=>{try{f()}catch(e){}});BOAST_UNSUB=[]}
 function bProf(){try{return JSON.parse(localStorage.getItem("ijang-bprof")||"null")||{}}catch(e){return{}}}
 function bProfSet(p){try{localStorage.setItem("ijang-bprof",JSON.stringify(p))}catch(e){}}
 function ymd(t){const d=new Date(t);return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")}
@@ -2105,7 +2116,7 @@ function boastOpen(){if(!ACCT.db){modal("마을 자랑하기",'<p>마을 자랑�
   const who=p=>escH(p.school||"")+' '+escH(p.year?p.year+"학년":"")+' · '+escH(p.nick||"이장님");
   const thumb=(p,cnt)=>'<button class="bthumb" data-open="'+p.id+'"><img src="'+p.img+'" alt="친구 마을 사진" loading="lazy"><span class="bt-n">'+who(p)+'</span><span class="bt-c">'+(p.uid===me?'⭐ 내 자랑 · ':'')+'응원 '+(cnt[p.id]||0)+'</span></button>';
   const detail=(p,cnt,mine)=>{const left=Math.max(1,Math.ceil((p.at+BOAST_DAYS*DAYMS-Date.now())/DAYMS)),own=p.uid===me,old=Date.now()-p.at>=BOAST_DAYS*DAYMS;
-    return '<div class="bdetail"><button class="ghost" id="bback">← 목록으로</button><img src="'+p.img+'" alt="친구 마을 사진"><div class="bmeta"><b>'+who(p)+'</b>'+
+    return '<div class="bdetail"><button class="ghost" id="bback">← 목록으로</button><img src="'+p.img+'" alt="친구 마을 사진" class="bzimg" title="눌러서 크게 보기"><span class="fine">🔍 사진을 누르면 크게 볼 수 있어요</span><div class="bmeta"><b>'+who(p)+'</b>'+
       '<span class="btags">'+(p.texts||[]).map(id=>BPH[id]?'<i>'+BPH[id]+'</i>':'').join("")+'</span><span class="fine">'+escH(p.vgrade||"")+' · 주민 '+(p.pop||0)+'명'+(old?' · 지난주 인기 마을':' · <b class="bdday">D-'+left+'</b>')+'</span></div>'+
       '<div class="bcheers big">'+CHEERS.map(([e,t],i)=>{const k=p.id+"|"+i;return '<button data-p="'+p.id+'" data-k="'+i+'" class="'+(mine.has(k)?"on":"")+'"'+(own||old?" disabled":"")+'>'+e+' '+t+' <i>'+(cnt[k]||0)+'</i></button>'}).join("")+'</div>'+
       (own?'<p class="fine">내 자랑이에요. 친구들이 보낸 응원이 숫자로 보여요.</p><button class="ghost bdel" data-mine="'+p.id+'">내 자랑 내리기</button>':'')+(DEV&&!own?'<button class="bdel" data-del="'+p.id+'">선생님: 내리기</button>':'')+'</div>'};
@@ -2118,6 +2129,7 @@ function boastOpen(){if(!ACCT.db){modal("마을 자랑하기",'<p>마을 자랑�
       (cur.length?'<div class="bgrid">'+cur.map(p=>thumb(p,cnt)).join("")+'</div>':'<p class="fine" style="text-align:center;padding:20px">이번 주에 자랑한 마을이 아직 없어요. 첫 번째로 자랑해 보세요!</p>')}
     $("bwall").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{openId=b.dataset.open;sfx("click");render();$("bwall").scrollTop=0;$("bwall").scrollIntoView({block:"nearest"})});
     if($("bback"))$("bback").onclick=()=>{openId=null;render()};
+    $("bwall").querySelectorAll(".bzimg").forEach(im=>im.onclick=()=>zoomView(im.src));
     $("bwall").querySelectorAll("[data-k]").forEach(b=>b.onclick=async()=>{const id=b.dataset.p+"_"+me+"_"+b.dataset.k;const ref=ACCT.db.collection("cheers").doc(id);b.disabled=true;
       try{if(b.classList.contains("on"))await ref.delete();else{await ref.set({post:b.dataset.p,kind:+b.dataset.k,by:me,at:Date.now(),expireAt:bExpire(Date.now())});sfx("good")}}catch(e){toast("지금은 응원을 보낼 수 없어요")}b.disabled=false});
     $("bwall").querySelectorAll("[data-mine],[data-del]").forEach(b=>b.onclick=async()=>{if(!b.dataset.sure){b.dataset.sure=1;b.textContent="정말 내릴까요? 한 번 더 눌러요";return}
@@ -2131,10 +2143,10 @@ function boastOpen(){if(!ACCT.db){modal("마을 자랑하기",'<p>마을 자랑�
     '<div class="row" style="justify-content:flex-start;margin-top:6px"><button id="bpost"'+(posted?" disabled":"")+'>자랑 올리기</button><button class="ghost" id="bre">다시 찍기</button></div>'+
     '<p class="fine" id="bmsg">'+(posted?"오늘은 이미 자랑했어요. 내일 또 올릴 수 있어요!":"자랑은 일주일 동안 전시돼요. 하루에 한 번 올릴 수 있어요. 실제 이름은 쓰지 말고 별명을 써요.")+'</p></div></div>'+
     '<div id="bwall" class="bwall"><p class="fine">불러오는 중…</p></div>';
-  $("veil").hidden=false;let shot=snapVillage(1200,true);$("bshot").src=shot||"";
+  $("veil").hidden=false;let shot=snapVillage(1600,true);$("bshot").src=shot||"";
   if(S.devUsed||DEV){$("bpost").disabled=true;$("bmsg").textContent="개발자 모드를 쓴 시험 마을이라 자랑 게시판에 올릴 수 없어요. 친구들 자랑은 볼 수 있어요.";}
   const bindPh=()=>$("bphs").querySelectorAll("[data-ph]").forEach(b=>b.onclick=()=>{const id=b.dataset.ph;if(picks.includes(id))picks=picks.filter(x=>x!==id);else{if(picks.length>=3){toast("자랑은 3개까지 고를 수 있어요");return}picks.push(id)}$("bphs").innerHTML=phHTML();bindPh()});bindPh();
-  $("bre").onclick=()=>{$("veil").hidden=true;setTimeout(()=>{shot=snapVillage(1200,true);$("veil").hidden=false;$("bshot").src=shot||""},60)};
+  $("bre").onclick=()=>{$("veil").hidden=true;setTimeout(()=>{shot=snapVillage(1600,true);$("veil").hidden=false;$("bshot").src=shot||""},60)};
   $("bpost").onclick=async()=>{const school=$("bsch").value.trim(),nick=$("bnick").value.trim(),year=+$("byr").value;
     if(!shot){$("bmsg").textContent="사진을 찍지 못했어요.";return}if(!school||!nick){$("bmsg").textContent="학교와 별명을 적어 주세요.";return}if(!picks.length){$("bmsg").textContent="자랑할 것을 하나 이상 골라 주세요.";return}
     if(/\d{3,}/.test(nick+school)){$("bmsg").textContent="숫자로 된 개인 정보는 쓰지 마세요.";return}
