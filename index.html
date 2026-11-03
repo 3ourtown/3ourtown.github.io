@@ -234,10 +234,10 @@ canvas#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;dis
   padding-block:7px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));z-index:5}
 .tray img,.card img{-webkit-user-drag:none;user-select:none;pointer-events:none}
 .tray{display:flex;gap:8px;overflow-x:auto;touch-action:pan-x;user-select:none;-webkit-user-select:none;flex:1;min-width:0;padding-bottom:2px}
-.card{position:relative;flex:0 0 auto;width:88px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:4px 4px 5px;
+.card{position:relative;flex:0 0 auto;width:100px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:4px 4px 5px;
   display:flex;flex-direction:column;align-items:center;gap:1px;text-align:center}
-.card img{width:62px;height:48px;object-fit:contain}
-.card .nm{font-size:13px;font-weight:700}
+.card img{width:74px;height:56px;object-fit:contain}
+.card .nm{font-size:14px;font-weight:700}
 .card .cost{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;display:flex;gap:4px;align-items:center}
 .card .cost svg,.card .cost img{width:12px;height:12px}
 .card.poor .cost{color:var(--alert)}
@@ -249,8 +249,8 @@ canvas#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;dis
 .card.pulse,.side .pulse{animation:pulse 1.2s infinite}
 @keyframes pulse{50%{box-shadow:0 0 0 5px rgba(233,169,44,.6)}}
 .side{display:flex;gap:8px;align-items:stretch}
-.side button{border-radius:12px;border:1px solid var(--line);background:#fff;padding:6px 12px;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:78px}
-.side svg{width:24px;height:24px}
+.side button{border-radius:12px;border:1px solid var(--line);background:#fff;padding:4px 8px;font-size:12.5px;line-height:1.2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:64px;max-width:82px}
+.side svg{width:20px;height:20px}
 #evbtn{position:relative}.evdot{position:absolute;top:5px;right:8px;width:9px;height:9px;border-radius:50%;background:#d9534f;box-shadow:0 0 0 2px #fff}
 .side .next{background:var(--pine);border-color:var(--pine);color:#fff;font-weight:700}
 .side .next.wait{background:#9bb5a6;border-color:#9bb5a6;font-variant-numeric:tabular-nums}
@@ -277,15 +277,22 @@ canvas#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;dis
   .brand{font-size:15px;flex:1}
   .stats{order:3;flex-basis:100%;gap:4px}
   .chip{padding:2px 7px;font-size:13px;gap:4px}.chip .k{display:none}.chip img{width:18px;height:18px}
-  .side #bookcount{font-size:12px}
+  .side #bookcount,.side #nextlbl,.side #evlbl{font-size:11px}
   .xpbar{width:56px}
-  .card{width:76px}.card img{width:52px;height:40px}
-  .side button{min-width:62px;padding:6px 8px}
+  .card{width:86px}.card img{width:62px;height:48px}.card .nm{font-size:13px}
+
   .mini canvas{width:120px;height:64px}
   .elder{left:max(4px,env(safe-area-inset-left,0px));bottom:92px;max-width:calc(100% - 8px)}
   .elder img{height:150px}.elder .bubble{margin-bottom:60px;font-size:14px}
   .wishes{width:calc(100% - 90px)}
   .compass{width:46px;height:46px}
+}
+@media (max-width:640px),(max-height:500px){
+  .side{flex-direction:column;gap:4px;width:84px;flex:0 0 84px}
+  .side button{flex:1;flex-direction:row;gap:4px;min-width:0;max-width:none;width:100%;padding:3px 6px;font-size:11.5px;white-space:nowrap;border-radius:10px}
+  .side svg{width:16px;height:16px;flex:0 0 16px}
+  .side #bookcount,.side #nextlbl,.side #evlbl{font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
+  #evbtn .evdot{top:3px;right:4px;width:7px;height:7px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -821,6 +828,7 @@ function checkUnlock(){
   while(S.zone<ZONES.length-1&&S.level>=ZONES[S.zone+1].lv){S.zone++;toast("새 땅이 열렸어요! 마을을 넓혀 보세요.")}
   if(!S.unlocked&&S.level>=UNLOCK.lv&&pop()>=UNLOCK.pop){S.unlocked=true;S.pubSeq=1;S.unlockSeason=S.seasonsTotal;addNote("helpful");
     say("마을이 제법 커졌구먼! 이제 공공기관을 지을 수 있다네. 한꺼번에 다 짓기는 어려우니 하나씩 해 보세. 먼저 마을의 안전을 지켜 줄 경찰서부터 지어 보게.",()=>pulse("police"))}}
+const NARROW=()=>matchMedia("(max-width:640px),(max-height:500px)").matches;
 function addNote(id){if(S.notes.includes(id))return;S.notes.push(id);gainXP(10);const n=NOTES.find(x=>x.id===id);if(!n)return;toast("마을 수첩에 '"+n.t+"'이(가) 기록되었어요")}
 const WNEW={},WTHX=[];
 function checkWishes(){
@@ -902,8 +910,8 @@ function update(){
     const act=S.wishes.map(id=>WISHES.find(w=>w.id===id));
     $("wishes").innerHTML=WTHX.map(t=>{const w=t.id?WISHES.find(x=>x.id===t.id):{face:t.face,who:t.who};return card(w,t.mood||"h",t.id?w.thx:t.text,(t.mood==="w"?"":"thx")+(now-(t.until-6000)<700?" new":""),"")}).join("")+(S.warn?card({face:S.warn.face,who:S.warn.who},"w","이장님, 요즘 마을이 불편해서 이사를 고민하고 있어요…","warn","소원을 들어주거나 조건을 채우면 행복해져요"):"")+
       act.map(w=>card(w,"w","이장님, "+w.text,(now-(WNEW[w.id]||0)<700?"new":""),"어떤 장소가 필요할까요?")).join("")}
-  $("bookcount").textContent=(W&&W<640?"수첩 ":"마을 수첩 ")+S.notes.length+"/"+NOTES.length;
-  $("nextbtn").classList.toggle("pulse",pulseOn==="next");$("evbtn").classList.toggle("pulse",pulseOn==="event");$("evdot").hidden=evDone();$("evlbl").textContent=(W&&W<640?"":"이달의 ")+"행사 "+realMonth()+"월";
+  $("bookcount").textContent=(NARROW()?"수첩 ":"마을 수첩 ")+S.notes.length+"/"+NOTES.length;
+  $("nextbtn").classList.toggle("pulse",pulseOn==="next");$("evbtn").classList.toggle("pulse",pulseOn==="event");$("evdot").hidden=evDone();$("evlbl").textContent=(NARROW()?"":"이달의 ")+"행사 "+realMonth()+"월";
   if(sel)showInfo(sel)}
 function bumpChip(k){const e=document.querySelector('.chip[data-k="'+k+'"]');if(e){e.classList.remove("bump");void e.offsetWidth;e.classList.add("bump")}}
 let pulseOn=null;function pulse(t){pulseOn=t;if(t==="folk")TRAYCAT="old";else if(DEFS[t])TRAYCAT=tcatOf(t);update()}
@@ -2402,7 +2410,7 @@ function frame(now){const dt=Math.min(100,now-last);last=now;tAnim=now;stepFling
     if(x.type==="lumber"&&isConn(x)){const L=LUMB[lumLv(B)-1],rate=(Math.min(3,adjForest(x.r,x.c))+(nearMount(x.r,x.c,2)?1:0))*L.rate/3;B.stock=Math.min(L.cap,(B.stock||0)+rate*dt/3000);if(lumLv(B)===3&&B.stock>=L.cap){const h=Math.floor(L.cap/2);B.stock-=h;S.wood+=h;cutForest(x,h);floats.push({r:x.r,c:x.c,txt:"나무 +"+h+" (자동)",t0:tAnim})}}
     if(B.building&&Date.now()>=B.building){B.type=B.to;delete B.building;delete B.to;floats.push({r:x.r,c:x.c,txt:HOUSES[B.type].nm+" 완성!",t0:tAnim});gainXP(12);S.happy=calcHappy();update();save()}});
   saveAcc+=dt;if(saveAcc>4000){saveAcc=0;save()}
-  const wait=DEV?0:(S.nextAt||0)-Date.now(),nb=$("nextbtn"),lbl=$("nextlbl");if(wait>0){nb.classList.add("wait");const s="다음 달까지 "+fmt(wait);if(lbl.textContent!==s)lbl.textContent=s}else if(nb.classList.contains("wait")){nb.classList.remove("wait");lbl.textContent="다음 달"}
+  const wait=DEV?0:(S.nextAt||0)-Date.now(),nb=$("nextbtn"),lbl=$("nextlbl");if(wait>0){nb.classList.add("wait");const s=(NARROW()?"⏳ ":"다음 달까지 ")+fmt(wait);if(lbl.textContent!==s)lbl.textContent=s}else if(nb.classList.contains("wait")){nb.classList.remove("wait");lbl.textContent="다음 달"}
   draw();if(ghost&&!ghost.dragging&&ghostScreen){const c=$("confirm");c.style.left=ghostScreen.x+"px";c.style.top=Math.max(8,Math.min(H-60,ghostScreen.y-70))+"px";$("cok").disabled=!ghostOk();const cw=$("cwhy");if(cw){const ok=ghostOk();cw.hidden=ok;if(!ok){const w=canPlace(ghost.type,ghost.r,ghost.c,ghost.moveK).why;if(cw.textContent!==w)cw.textContent=w}}}
   miniAcc+=dt;if(miniAcc>120){miniAcc=0;drawMini()}
   requestAnimationFrame(frame)}
