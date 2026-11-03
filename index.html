@@ -2478,7 +2478,7 @@ function migrate(){if(!S.tl){S.tl=[{y:1,m:3,t:"마을이 생겼어요"}]}S.grade
 function afterLogin(){setTimeout(()=>{if(typeof checkUnlock==="function"){checkUnlock();update()}},1500);newbInit();setTimeout(()=>{if(typeof bongHint==="function"&&$("elder").hidden&&$("veil").hidden)bongHint()},9000);setTimeout(()=>{if(typeof noriHint==="function")noriHint()},4000);if(S.unlocked&&!S.conds)setTimeout(()=>say("이장님, 하나 묻겠네. 이장님이 생각하는 살기 좋은 마을은 어떤 마을인가?",()=>condPick(true)),2500);S.happy=calcHappy();updAcct();updSnd();setTimeout(sndAsk,400);setTool(null);sel=null;$("info").hidden=true;update();intro();setTimeout(()=>{if($("elder").hidden&&$("veil").hidden)evNotice()},1200)}
 function fbInit(){const cfg=window.FIREBASE_CONFIG;if(!cfg||!cfg.apiKey)return Promise.resolve(null);
   const load=src=>new Promise((res,rej)=>{const e=document.createElement("script");e.src=src;e.onload=res;e.onerror=rej;document.head.appendChild(e)});const B="https://www.gstatic.com/firebasejs/10.12.2/";
-  return load(B+"firebase-app-compat.js").then(()=>Promise.all([load(B+"firebase-auth-compat.js"),load(B+"firebase-firestore-compat.js")])).then(()=>{if(!firebase.apps.length)firebase.initializeApp(cfg);return firebase.auth().signInAnonymously()})
+  return load(B+"firebase-app-compat.js").then(()=>Promise.all([load(B+"firebase-auth-compat.js"),load(B+"firebase-firestore-compat.js")])).then(()=>{if(!firebase.apps.length)firebase.initializeApp(cfg);return new Promise(r=>{const un=firebase.auth().onAuthStateChanged(u=>{un();r(u)})}).then(u=>u?{user:u}:firebase.auth().signInAnonymously())})
     .then(c=>{ACCT.fb=true;ACCT.uid=c.user.uid;return firebase.firestore()}).catch(e=>{console.warn("firebase",e);return null})}
 function start(data){
   S=(data&&data.b)?data:(load()||fresh());migrate();

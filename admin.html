@@ -33,10 +33,8 @@ button.warn{background:#fff;color:var(--alert);border-color:var(--alert)}
 <main>
 <h1>🏛️ 이장님 관리실 <span class="fine">(선생님용)</span></h1>
 <div class="card" id="login">
-  <p>Firebase에서 만든 <b>관리자 이메일 계정</b>으로 들어가요.</p>
-  <input id="em" type="email" placeholder="관리자 이메일" autocomplete="username">
-  <input id="pw" type="password" placeholder="비밀번호" autocomplete="current-password">
-  <button id="go">들어가기</button> <span class="fine" id="lmsg"></span>
+  <p>관리자로 정한 <b>Google 계정</b>으로 들어가요.</p>
+  <button id="go">Google 계정으로 들어가기</button> <span class="fine" id="lmsg"></span>
 </div>
 <div id="app" hidden>
   <div class="tabs"><button data-t="boast" class="on">자랑 게시판</button><button data-t="fb" class="ghost">선생님께 말하기</button><button class="ghost" id="clean">오래된 자랑 청소</button><button class="ghost" id="out">나가기</button></div>
@@ -57,7 +55,7 @@ load(B+"firebase-app-compat.js").then(()=>Promise.all([load(B+"firebase-auth-com
   firebase.initializeApp(window.FIREBASE_CONFIG);db=firebase.firestore();
   firebase.auth().onAuthStateChanged(u=>{if(u&&!u.isAnonymous){$("login").hidden=true;$("app").hidden=false;show()}else{$("login").hidden=false;$("app").hidden=true}});
 });
-$("go").onclick=async()=>{$("lmsg").textContent="확인 중…";try{await firebase.auth().signInWithEmailAndPassword($("em").value.trim(),$("pw").value);$("lmsg").textContent=""}catch(e){$("lmsg").textContent="들어가지 못했어요: "+(e.code||e.message)}};
+$("go").onclick=async()=>{$("lmsg").textContent="확인 중…";try{await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());$("lmsg").textContent=""}catch(e){$("lmsg").textContent="들어가지 못했어요: "+(e.code||e.message)}};
 $("out").onclick=()=>firebase.auth().signOut();
 document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll("[data-t]").forEach(x=>{x.className=x===b?"on":"ghost"});show()});
 async function show(){$("list").innerHTML='<p class="fine">불러오는 중…</p>';
@@ -70,7 +68,7 @@ async function show(){$("list").innerHTML='<p class="fine">불러오는 중…</
       const rows=q.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.at||0)-(a.at||0));
       $("list").innerHTML='<div class="card">'+(rows.map(r=>'<div class="fb"><b>'+(r.cat?'['+esc(r.cat)+'] ':'')+esc(r.who||"이장님")+'</b> <span class="fine">'+esc(r.month||'')+' · Lv '+esc(r.lv||'')+'</span> <span class="fine">'+(r.at?new Date(r.at).toLocaleString("ko-KR"):"")+'</span><div>'+esc(r.text||r.msg||JSON.stringify(r))+'</div><button class="warn" data-d="'+r.id+'" style="margin-top:4px;padding:4px 10px">지우기</button></div>').join("")||'<p class="fine">아직 없어요.</p>')+'</div>';
       $("list").querySelectorAll("[data-d]").forEach(b=>b.onclick=async()=>{await db.collection("feedback").doc(b.dataset.d).delete();show()})}}
-  catch(e){$("list").innerHTML='<p class="fine">불러오지 못했어요. 보안 규칙의 ADMIN_EMAIL이 이 계정 이메일과 같은지 확인해 주세요. ('+esc(e.code||e.message)+')</p>'}}
+  catch(e){$("list").innerHTML='<p class="fine">불러오지 못했어요. 관리자로 정한 Google 계정인지 확인해 주세요. ('+esc(e.code||e.message)+')</p>'}}
 $("clean").onclick=async()=>{if(!confirm("14일이 지난 자랑과 응원을 지울까요?"))return;const cut=Date.now()-14*DAY;let n=0;
   for(const c of ["boast","cheers"]){const q=await db.collection(c).where("at","<",cut).limit(400).get();for(const d of q.docs){await d.ref.delete();n++}}alert(n+"개를 지웠어요");show()};
 })();

@@ -1,10 +1,10 @@
 rules_version = '2';
 // 「우리 마을 이장님」 보안 규칙
-// ★ 아래 ADMIN_EMAIL 을 선생님 관리자 계정 이메일로 바꿔서 붙여 넣으세요.
+// 관리자: 선생님 Google 계정
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
-    function isAdmin() { return signedIn() && request.auth.token.email == 'ADMIN_EMAIL'; }
+    function isAdmin() { return signedIn() && request.auth.token.email == 'bohwan9606@gmail.com' && request.auth.token.email_verified == true; }
     function nowMs() { return request.time.toMillis(); }
 
     // 마을 저장 (아이디로 이어 하기)
