@@ -474,7 +474,8 @@ const COMP={
   nori:{items:[["c_daljip",.42,.42,.5],["c_kite",.5,1.55,.36],["c_yut",.95,1.0,.62],["c_seesaw",1.55,.5,.56],["c_tuho",1.55,1.5,.5],["c_table",1.78,1.05,.44]]},
   market:{items:[["m_stall1",.92,.68,.68],["m_stall2",.68,1.3,.68],["m_crates",1.45,1.75,.32],["m_baskets",1.62,.62,.42],["m_sacks",1.78,1.32,.42]]}};
 const ORDER=["house","lumber","playground","park","market","school","hospital","fire","police","digsite","museum","busstop","senior","daycare","multi","worldfood","locker","recycle","fest","aigreen","post"];
-function trayVis(t){const us=(S.u3&&S.u3.st)||0;if(t==="aigreen")return us>=2;if(t==="post")return !!((S.bong&&S.bong.first)||Object.keys(S.comm||{}).length);if(t==="senior"||t==="daycare")return us>=1;if(t==="multi"||t==="worldfood"||t==="locker")return us>=2;if(t==="recycle")return !!S.unlocked;if(t==="fest")return us>=3;return t==="busstop"?transOpen():t==="digsite"?!!(S.h2&&S.h2.st>=1):t==="museum"?!!(S.h2&&S.h2.st>=4):true}
+function trayVis(t){return baseVis(t)&&(!DRIP.includes(t)||dripOpen(t))}
+function baseVis(t){const us=(S.u3&&S.u3.st)||0;if(t==="aigreen")return us>=2;if(t==="post")return !!((S.bong&&S.bong.first)||Object.keys(S.comm||{}).length);if(t==="senior"||t==="daycare")return us>=1;if(t==="multi"||t==="worldfood"||t==="locker")return us>=2;if(t==="recycle")return !!S.unlocked;if(t==="fest")return us>=3;return t==="busstop"?transOpen():t==="digsite"?!!(S.h2&&S.h2.st>=1):t==="museum"?!!(S.h2&&S.h2.st>=4):true}
 const UNLOCK={lv:4,pop:20};
 const ZONES=[{lv:1,a:11,b:24},{lv:4,a:8,b:27},{lv:7,a:5,b:30},{lv:12,a:0,b:35}];
 const LV=[0,30,80,150,240,350,480,640,820,1020,1250,1500,1780,2100,2450,2850,3300,3800,4350,4950];
@@ -821,6 +822,23 @@ const PUBSEQ=["police","fire","hospital","school"];
 function pubDone(){if(!S.unlocked)return false;if(S.pubAll)return true;if(PUBSEQ.every(t=>bList().some(x=>x.type===t))){S.pubAll=1;return true}return false}
 function pubNext(){return PUBSEQ.find(t=>!bList().some(x=>x.type===t))}
 function pubWait(t){if(!S.unlocked||S.pubAll||!PUBSEQ.includes(t))return false;const nx=pubNext();return !!nx&&PUBSEQ.indexOf(t)>PUBSEQ.indexOf(nx)}
+/* 필수 공공기관(경찰·소방·병원·학교) 다음 건물은 한 달에 하나씩 열려요 */
+const DRIP=["recycle","senior","daycare","multi","worldfood","locker","aigreen"];
+const DRIP_SAY={recycle:"마을 사람이 늘면서 쓰레기도 많아졌구먼. 이제 분리수거장을 지을 수 있다네. 종류별로 나누어 버리면 다시 쓸 수 있지!",
+  senior:"요즘 마을에 머리 하얀 어르신이 많아졌구먼. 노인 인구가 많아지는 것을 '고령화'라고 한다네. 어르신들이 모여 쉴 경로당을 지을 수 있게 되었네.",
+  daycare:"아기는 적게 태어나고(저출생), 엄마 아빠가 함께 일하는 집은 많아졌다네. 아이를 돌봐 줄 어린이집을 지을 수 있게 되었네.",
+  multi:"토야네처럼 다른 나라에서 온 가족이 한국말을 배우고 마을에 잘 적응하도록 돕는 곳이 있다네. 다문화 가족 지원센터를 지을 수 있게 되었네.",
+  worldfood:"여러 나라 이웃이 늘었으니 서로의 음식을 나누어 보면 어떻겠나? 세계 음식점을 지을 수 있게 되었네.",
+  locker:"요즘은 인터넷으로 물건을 많이 산다네. 집에 없어도 택배를 찾는 무인 택배함을 지을 수 있게 되었네. 이런 변화를 '정보화'라고 하지.",
+  aigreen:"센서와 인공지능이 온도와 물을 맞춰 채소를 길러 주는 인공지능 온실을 지을 수 있게 되었네!"};
+function mIdx(){return S.year*12+S.month}
+function dripOpen(t){return !!(S.drip&&S.drip.open.includes(t))}
+function dripTick(){if(!S||!S.drip||!$("veil").hidden||!$("elder").hidden)return;const D=S.drip;
+  const nx=DRIP.find(t=>!D.open.includes(t)&&baseVis(t));if(!nx)return;
+  const last=D.last,lastOk=!last||count(last)>0||mIdx()-(D.at||0)>=2;if(D.at===mIdx()||!lastOk)return;
+  D.open.push(nx);D.last=nx;D.at=mIdx();save();update();tlAdd(DEFS[nx].nm+"을(를) 지을 수 있게 되었어요");
+  say(DRIP_SAY[nx],()=>pulse(nx),"elder","h")}
+function dripWait(){return DRIP.find(t=>!dripOpen(t)&&baseVis(t))}
 function pubTick(){if(!S||!S.unlocked||!S.pubSeq||!$("veil").hidden||!$("elder").hidden)return;const nx=pubNext(),k=nx||"done";if(S.pubTold===k)return;
   if(!S.pubTold){S.pubTold="police";return}S.pubTold=k;save();const NM={fire:"소방서",hospital:"병원",school:"학교"};
   if(nx)say("좋아! 이제 "+NM[nx]+"도 지을 수 있다네. "+(nx==="fire"?"불이 나면 달려와 줄 소방서를 지어 보게.":nx==="hospital"?"아픈 주민이 치료받을 병원을 지어 보게.":"아이들이 배우고 친구를 만날 학교를 지어 보게."),()=>pulse(nx));
@@ -862,7 +880,7 @@ function checkWishes(){
   S.wishes.slice().forEach(id=>{const w=WISHES.find(x=>x.id===id);if(count(w.need)>=(w.n||1)){S.wishes=S.wishes.filter(x=>x!==id);S.doneWishes.push(id);WTHX.push({id,until:Date.now()+6000});setTimeout(update,6100);sfx("good");
     gainXP(30);toast(w.who+"의 소원을 들어주었어요! 경험치 +30");if(DEFS[w.need].pub)addNote(w.need)}});
   const st={u3:(S.u3&&S.u3.st)||0,pop:pop(),unlocked:S.unlocked,since:S.seasonsTotal-S.unlockSeason,av:t=>t==="nori"?!!(folkOpen_()&&folkStage()>=2):(trayVis(t)&&!isLocked(t)),dino:bList().some(x=>x.type==="playground"&&spLv(x)>=3)&&bList().some(x=>x.type==="park"&&spLv(x)>=3)};
-  for(const w of WISHES){if(S.wishes.length>=2)break;if(S.wishes.includes(w.id)||S.doneWishes.includes(w.id))continue;
+  for(const w of WISHES){if(S.wishes.length>=2)break;if(S.wishes.includes(w.id)||S.doneWishes.includes(w.id))continue;if(DRIP.includes(w.need)&&!dripOpen(w.need))continue;
     if(w.when(st)){if(count(w.need)>=(w.n||1)){S.doneWishes.push(w.id);continue}S.wishes.push(w.id);WNEW[w.id]=Date.now();sfx("click");
       if(S.tut===3){S.tut=4;say("주민이 소원을 말했구먼! 화면 왼쪽 위 말풍선을 보게. 소원을 들어주면 마을이 행복해지고 이장님 레벨도 오른다네. 무엇을 지어야 할지는 이장님이 생각해 보게!")}}}
   if(S.happy>=75&&pop()>=8&&S.conds)addNote("good");condCheck();h2Check();gradeCheck()}
@@ -1913,7 +1931,7 @@ function markKnown(t){if(!S.knownB||!t)return;if(t==="folk"){coachHide();return}
 function newbList(){if(!S||!S.knownB)return [];return availBuilds().filter(t=>!S.knownB.includes(t))}
 let COACH=null;
 function coachHide(){COACH=null;const c=$("coach");if(c)c.hidden=true}
-function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof pubTick==="function")pubTick();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
+function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof pubTick==="function")pubTick();if(typeof dripTick==="function")dripTick();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
   const nb=newbList();if(!nb.length){el.hidden=true;return}const here=t=>!!document.querySelector('#tray .card[data-t="'+t+'"]');const t=nb.find(here)||nb[0];
   let target=null,txt="";
   if(here(t)){target=document.querySelector('#tray .card[data-t="'+t+'"]');txt="새로 지을 수 있어요: "+DEFS[t].nm+"! 여기를 눌러 보세요 👇"}
@@ -2274,8 +2292,8 @@ function chapter(){const H=S.h2||{},T=S.trans||{},B=S.bong||{},U=S.u3||{};
   if(!B.first)return{i:5,t:"봉수대를 눌러 봉수 신호를 보내 한양까지 소식을 전해요"};
   // 7 다양한 문화
   if((U.st||0)<1)return{i:6,t:"곧 마을에 새로운 변화가 찾아와요. 다음 달로 넘겨 보세요"};
-  if(U.st===1)return{i:6,t:"경로당과 어린이집을 지어요 ("+((count("senior")?1:0)+(count("daycare")?1:0))+"/2)",go:{t:"경로당 찾기",f:goPulse(count("senior")?"daycare":"senior",false)}};
-  if(U.st===2)return{i:6,t:"다문화 가족 지원센터와 세계 음식점을 지어요 ("+((count("multi")?1:0)+(count("worldfood")?1:0))+"/2)",go:{t:"건물 찾기",f:goPulse(count("multi")?"worldfood":"multi",false)}};
+  if(U.st===1){const nd=["senior","daycare"].filter(t=>!count(t)),op=nd.find(dripOpen);return{i:6,t:"경로당과 어린이집을 지어요 ("+(2-nd.length)+"/2)"+(op?"":" · 다음 달로 넘기면 새 건물이 열려요"),go:op?{t:DEFS[op].nm+" 찾기",f:goPulse(op,false)}:null}}
+  if(U.st===2){const nd=["multi","worldfood"].filter(t=>!count(t)),op=nd.find(dripOpen);return{i:6,t:"다문화 가족 지원센터와 세계 음식점을 지어요 ("+(2-nd.length)+"/2)"+(op?"":" · 다음 달로 넘기면 새 건물이 열려요"),go:op?{t:DEFS[op].nm+" 찾기",f:goPulse(op,false)}:null}}
   if(U.st===3)return{i:6,t:bList().some(x=>x.type==="fest")?"축제 마당을 눌러 세계 문화 축제를 열어요":"축제 마당을 짓고 세계 문화 축제를 열어요",go:bList().some(x=>x.type==="fest")?null:{t:"축제 마당 찾기",f:goPulse("fest",false)}};
   // 8 졸업
   if(!S.grad){const A=albumItems();return{i:7,t:"마을 앨범을 모두 채우면 졸업장을 받아요",bars:A.map(([t,v,m])=>[t,v,m])}}
@@ -2400,7 +2418,8 @@ function devPanel(){modal("개발자 모드 켜짐",'<ul><li>돈과 나무가 �
   {t:"공룡 놀이공원 준비 (놀이터·공원 3단계)",ghost:true,keep:true,f:()=>{bList().forEach(x=>{if(x.type==="playground"||x.type==="park")S.b[x.k].sp=3});S.items.slide=(S.items.slide||0)+3;S.items.fossil=(S.items.fossil||0)+3;setTimeout(save,50);toast("놀이터·공원을 3단계로 올렸어요. 서로 붙여 두고 눌러 보세요");update()}},
   {t:"졸업장 미리 보기",ghost:true,keep:true,f:()=>{$("veil").hidden=true;setTimeout(()=>gradShow(false),50)}},
   {t:"마우스 위치 표시 (점검용)",ghost:true,keep:true,f:()=>{DBGXY=!DBGXY;toast(DBGXY?"게임이 읽은 마우스 위치에 빨간 십자가 보여요":"마우스 위치 표시를 껐어요")}},
-  {t:"2학기 1단원 바로 열기 (사회 변화)",ghost:true,keep:true,f:()=>{u3().st=Math.max(1,u3().st);setTimeout(save,50);$("veil").hidden=true;toast("경로당·어린이집을 지을 수 있어요");update()}},
+  {t:"2학기 1단원 바로 열기 (사회 변화)",ghost:true,keep:true,f:()=>{u3().st=Math.max(1,u3().st);setTimeout(save,50);$("veil").hidden=true;toast("경로당부터 한 달에 하나씩 열려요");update()}},
+  {t:"다음 건물 바로 열기 (한 달에 하나 건너뛰기)",ghost:true,keep:true,f:()=>{if(!dripWait()){toast("지금 열 건물이 없어요");return}S.drip.at=0;S.drip.last=null;$("veil").hidden=true;update();setTimeout(dripTick,50)}},
   {t:"봉수 위급 소식 띄우기",ghost:true,keep:true,f:()=>{if(!(S.bong&&S.bong.s&&S.bong.e)){toast("봉수대 두 곳을 먼저 지어요");return}S.bong.alert=1;setTimeout(save,50);toast("남쪽 봉수대에 위급 소식이 떴어요");update()}},
   {t:"통신 단원 바로 열기 (봉수대)",ghost:true,keep:true,f:()=>{if(!folkOpen_()){toast("먼저 시간 다리를 열어요");return}tr().open=1;bg().open=1;setTimeout(save,50);$("veil").hidden=true;const m=MOUNTS[5];centerOn(m.r+2,m.c+2);clampView();toast("남쪽 산과 동쪽 산에 봉수대 자리가 생겼어요");update()}},
   {t:"교통 단원 바로 열기 (탈것 마당)",ghost:true,keep:true,f:()=>{if(!folkOpen_()){toast("먼저 시간 다리를 열어요");return}tr().open=1;setTimeout(save,50);toast("탈것 마당과 버스 정류장을 지을 수 있어요");update()}},
@@ -2568,7 +2587,7 @@ function acctInfo(){
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){save();if(ACCT.ref)cloudSave(true)}});
 window.addEventListener("pagehide",()=>{save();if(ACCT.ref)cloudSave(true)});
 setInterval(()=>{if(S&&$("acct").hidden)save()},20000);
-function migrate(){if(S.unlocked&&!S.pubSeq)S.pubAll=1;if(!S.tl){S.tl=[{y:1,m:3,t:"마을이 생겼어요"}]}S.grade=S.grade||0;if(S.month==null)S.month=[3,6,9,12][S.season||0];S.season=SEASON_OF(S.month);S.items=S.items||{};S.evDone=S.evDone||{};Object.values(S.b).forEach(b=>{if(b.type==="hospital")b.n=1});{const H=S.b["17,16"];if(H&&H.type==="hall"&&!["16,15","16,16","17,15"].some(k=>S.b[k]||T[+k.split(",")[0]][+k.split(",")[1]]!=="g"||Object.values(S.b).some(()=>false))){let free=true;for(const x of bList()){if(x.k==="17,16")continue;const n=x.n||1;for(const [rr,cc] of [[16,15],[16,16],[17,15]])if(rr>=x.r&&rr<x.r+n&&cc>=x.c&&cc<x.c+n)free=false}if(free&&!(S.roads&&(S.roads["16,15"]||S.roads["16,16"]||S.roads["17,15"]))){delete S.b["17,16"];S.b["16,15"]={...H,n:2}}}}S.happy=calcHappy();}
+function migrate(){if(!S.drip){S.drip={open:DRIP.filter(t=>baseVis(t)),at:0}}if(S.unlocked&&!S.pubSeq)S.pubAll=1;if(!S.tl){S.tl=[{y:1,m:3,t:"마을이 생겼어요"}]}S.grade=S.grade||0;if(S.month==null)S.month=[3,6,9,12][S.season||0];S.season=SEASON_OF(S.month);S.items=S.items||{};S.evDone=S.evDone||{};Object.values(S.b).forEach(b=>{if(b.type==="hospital")b.n=1});{const H=S.b["17,16"];if(H&&H.type==="hall"&&!["16,15","16,16","17,15"].some(k=>S.b[k]||T[+k.split(",")[0]][+k.split(",")[1]]!=="g"||Object.values(S.b).some(()=>false))){let free=true;for(const x of bList()){if(x.k==="17,16")continue;const n=x.n||1;for(const [rr,cc] of [[16,15],[16,16],[17,15]])if(rr>=x.r&&rr<x.r+n&&cc>=x.c&&cc<x.c+n)free=false}if(free&&!(S.roads&&(S.roads["16,15"]||S.roads["16,16"]||S.roads["17,15"]))){delete S.b["17,16"];S.b["16,15"]={...H,n:2}}}}S.happy=calcHappy();}
 function afterLogin(){if(S&&!S.startBonus){S.startBonus=1;S.money+=100;save();setTimeout(()=>say("이장님, 마을 지원금이 나왔다네! 돈 +100. 마을을 더 멋지게 가꿔 보게.",null,"elder","h"),3500)}setTimeout(()=>{if(typeof checkUnlock==="function"){checkUnlock();update()}},1500);newbInit();setTimeout(()=>{if(typeof bongHint==="function"&&$("elder").hidden&&$("veil").hidden)bongHint()},9000);setTimeout(()=>{if(typeof noriHint==="function")noriHint()},4000);if(S.unlocked&&!S.conds&&pubDone())setTimeout(()=>say("이장님, 하나 묻겠네. 이장님이 생각하는 살기 좋은 마을은 어떤 마을인가?",()=>condPick(true)),2500);S.happy=calcHappy();updAcct();updSnd();setTimeout(sndAsk,400);setTool(null);sel=null;$("info").hidden=true;update();intro();setTimeout(()=>{if($("elder").hidden&&$("veil").hidden)evNotice()},1200)}
 function playMark(){if(!ACCT.db)return;const d=new Date(),day=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
   let uid=ACCT.uid;if(!uid){try{uid=localStorage.getItem("ijang-devid")||("d"+Math.random().toString(36).slice(2,12));localStorage.setItem("ijang-devid",uid)}catch(e){return}}
