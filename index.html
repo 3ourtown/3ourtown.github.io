@@ -96,6 +96,8 @@ button,.card,.brand{touch-action:manipulation;-webkit-tap-highlight-color:transp
 .bfoot{display:flex;gap:14px;justify-content:center;margin-top:14px;border-top:1px solid var(--line);padding-top:8px}.bfoot .linkb{background:none;border:0;color:#8a7f6a;font:inherit;font-size:12px;text-decoration:underline;cursor:pointer}
 .traywrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}.tcats{display:flex;gap:4px;overflow-x:auto}.tcats button{position:relative;flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 11px;font:inherit;font-size:13px;font-weight:600;color:#4b4436}.tcats button.on{background:#2f7a55;color:#fff;border-color:#2f7a55}.tcats small{font-weight:400}.tcats small img{height:12px!important}
 .tdot{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:#c8503b;border:1.5px solid #fff}
+.chip.ichip{display:none;font:inherit;cursor:pointer;gap:8px}.ichip span{display:inline-flex;align-items:center;gap:2px}.ichip span.bump{animation:bump .4s}
+@media (min-width:900px) and (min-height:501px){.chip.ichip{display:flex}}.chip.ichip.nofit{display:none!important}
 .tdchip{border:1px solid #9cc7ad;background:#eef7f1;font:inherit;cursor:pointer}.tdchip b{font-weight:700}
 .ftab{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}.ftab th,.ftab td{border:1px solid var(--line);padding:6px;text-align:left;vertical-align:top}.ftab th{background:#fff3cf}
 .ph{display:inline-flex;align-items:center;justify-content:center;min-width:56px;padding:0 6px;border:2px dashed #cdbf9f;border-radius:10px;background:#faf3e2;color:#8a7a5a;font-size:11px;line-height:1.2;text-align:center;box-sizing:border-box}
@@ -845,6 +847,12 @@ function moneyTipTick(){if(!S||S.moneyTip||(S.tut||0)<3||(S.seasonsTotal||0)<1||
   modal("📢 이장님께 알림 · 마을 살림 돈",'<p><b>마을 살림 돈은 주민들이 내는 세금으로 모여요.</b> 집을 많이 지어 주민이 늘어날수록 다음 달에 들어오는 돈이 많아져요. 주민이 행복하면 돈이 더 많이 들어와요.</p>'+
     '<div class="pact"><h4>주민이 늘면 한 달에 들어오는 돈</h4>'+ex.map(([n,m])=>'<div class="fbar"><div><span>주민 '+n+'명</span><b>약 '+m+'원</b></div><span class="tr"><i style="width:'+Math.round(m/125*100)+'%"></i></span></div>').join("")+'<p class="fine">행복이 60쯤일 때 예시예요. 행복이 높으면 더 많이 들어와요.</p></div>'+
     '<p>처음에는 돈이 조금씩 들어오지만, 주민이 늘면 금방 넉넉해져요. <b>참을성 있게 마을을 키워 보세요!</b></p><p class="fine">지금 우리 마을: 주민 '+pop()+'명 · 행복 '+Math.round(S.happy)+' · 다음 달 살림 돈 약 '+(Math.round(pop()*2*S.happy/100)+5)+'원</p>',[{t:"알겠어요!"}])}
+function itemInfo(){modal("모은 재료",'<div class="pact">'+["seed","lantern","fossil","slide"].map(k=>'<div class="pc" style="flex-direction:row;align-items:center;gap:10px">'+ic(k,34)+'<span style="display:flex;flex-direction:column"><b>'+ITEMS[k].nm+' '+(S.items[k]||0)+'개</b><span>'+ITEMS[k].use+'</span></span></div>').join("")+'</div><p class="fine">재료는 이달의 행사에서 모아요.</p>',[{t:"이달의 행사",ghost:true,f:()=>setTimeout(()=>{eventOpen();update()},50)},{t:"닫기"}])}
+const NOTICES=[{id:"boast1",when:()=>!!(typeof ACCT!=="undefined"&&ACCT.db),t:"📢 운영자 알림 · 마을 자랑 게시판",
+  b:'<p>위쪽 <b>📸 자랑</b> 버튼을 누르면 <b>다른 학교 친구들의 마을</b>을 구경할 수 있어요.</p><ul><li>친구 마을 사진을 눌러 크게 보고, 👍 좋아요 · 👏 멋져요 · 😍 부러워요로 응원해 보세요.</li><li><b>우리 마을 사진도 올려 자랑</b>해 보세요. 하루에 한 번 올릴 수 있고, 일주일 동안 전시돼요.</li><li>학교·학년·별명만 보여요. 진짜 이름은 쓰지 않아요.</li></ul><p class="fine">응원을 많이 받은 마을은 "지난주 인기 마을"로 한 번 더 소개돼요.</p>',
+  go:{t:"📸 자랑 게시판 가기",f:()=>setTimeout(()=>boastOpen(),50)}}];
+function noticeTick(){if(!S||(S.tut||0)<3||!$("veil").hidden||!$("elder").hidden)return;if(!S.moneyTip)return;S.seenN=S.seenN||[];
+  const n=NOTICES.find(x=>!S.seenN.includes(x.id)&&x.when());if(!n)return;S.seenN.push(n.id);save();modal(n.t,n.b,[{t:"나중에",ghost:true},n.go])}
 function pubTick(){if(!S||!S.unlocked||!S.pubSeq||!$("veil").hidden||!$("elder").hidden)return;const nx=pubNext(),k=nx||"done";if(S.pubTold===k)return;
   if(!S.pubTold){S.pubTold="police";return}S.pubTold=k;save();const NM={fire:"소방서",hospital:"병원",school:"학교"};
   if(nx)say("좋아! 이제 "+NM[nx]+"도 지을 수 있다네. "+(nx==="fire"?"불이 나면 달려와 줄 소방서를 지어 보게.":nx==="hospital"?"아픈 주민이 치료받을 병원을 지어 보게.":"아이들이 배우고 친구를 만날 학교를 지어 보게."),()=>pulse(nx));
@@ -941,8 +949,9 @@ function update(){
     '<div class="chip" data-k="wood"><img src="assets/logs.webp" alt=""><span class="k">나무</span> '+(DEV?"무한":S.wood)+'</div>'+(DEV?'<div class="chip" style="background:#fff3cf">개발자 모드</div>':'')+
     '<div class="chip" data-k="pop">'+PEOPLE+'<span class="k">주민</span> '+p+'</div>'+
     '<div class="chip" data-k="happy">'+face(h)+'<span class="k">행복</span> '+h+'</div>'+
-    '<div class="chip"><span class="dot" style="background:'+se.c+'"></span>'+S.month+'월 <span class="k">'+se.n+' · '+S.year+'년차</span></div>';
-  const vals={money:S.money,wood:S.wood,pop:p,happy:h};Object.keys(vals).forEach(k=>{if(lastVals[k]!==undefined&&lastVals[k]!==vals[k])bumpChip(k)});lastVals=vals;
+    '<div class="chip"><span class="dot" style="background:'+se.c+'"></span>'+S.month+'월 <span class="k">'+se.n+' · '+S.year+'년차</span></div>'+
+    '<button class="chip ichip" id="ichip" title="모은 재료 · 누르면 쓰임새">'+["seed","lantern","fossil","slide"].map(k=>'<span data-k="it_'+k+'" title="'+ITEMS[k].nm+'">'+ic(k,18)+'<b>'+(S.items[k]||0)+'</b></span>').join("")+'</button>';
+  ichipFit();const vals={money:S.money,wood:S.wood,pop:p,happy:h,it_seed:S.items.seed||0,it_lantern:S.items.lantern||0,it_fossil:S.items.fossil||0,it_slide:S.items.slide||0};Object.keys(vals).forEach(k=>{if(lastVals[k]!==undefined&&lastVals[k]!==vals[k])bumpChip(k)});lastVals=vals;
   $("lv").textContent="Lv "+S.level;{const t=titleOf(S.level),b=$("bdg");if(b.dataset.bd!==t.bd){b.src="assets/"+t.bd+".webp";b.dataset.bd=t.bd}b.title=t.nm}const lo=LV[S.level-1]||0,hi=LV[S.level]||lo+100;$("xp").style.width=Math.min(100,(S.xp-lo)/(hi-lo)*100)+"%";
   const NB=newbList();const bcard=t=>{const d=DEFS[t],dc=costOf(t),lock=isLocked(t),poor=!afford(dc);
     return '<button class="card'+(NB.includes(t)?" newb":"")+(tool===t?" on":"")+(lock?" locked":"")+(poor&&!lock?" poor":"")+(pulseOn===t?" pulse":"")+'" data-t="'+t+'" title="'+(d.tip||d.nm)+'">'+
@@ -964,7 +973,8 @@ function update(){
   $("bookcount").textContent=(NARROW()?"수첩 ":"마을 수첩 ")+S.notes.length+"/"+NOTES.length;
   $("nextbtn").classList.toggle("pulse",pulseOn==="next");$("evbtn").classList.toggle("pulse",pulseOn==="event");$("evdot").hidden=evDone();$("evlbl").textContent=(NARROW()?"":"이달의 ")+"행사 "+realMonth()+"월";
   if(sel)showInfo(sel)}
-function bumpChip(k){const e=document.querySelector('.chip[data-k="'+k+'"]');if(e){e.classList.remove("bump");void e.offsetWidth;e.classList.add("bump")}}
+function ichipFit(){const e=$("ichip"),st=$("stats");if(!e)return;e.classList.add("nofit");const h0=st.offsetHeight;e.classList.remove("nofit");if(st.offsetHeight>h0+2)e.classList.add("nofit")}
+function bumpChip(k){const e=document.querySelector('#stats [data-k="'+k+'"]');if(e){e.classList.remove("bump");void e.offsetWidth;e.classList.add("bump")}}
 let pulseOn=null;function pulse(t){pulseOn=t;if(t==="folk")TRAYCAT="old";else if(DEFS[t])TRAYCAT=tcatOf(t);update()}
 function setTool(t){tool=t;if(t&&ghost){ghost=null;$("confirm").hidden=true}if(t&&pulseOn===t)pulseOn=null;if(t){sel=null;$("info").hidden=true}
   if(t==="road"&&pulseOn==="road")pulseOn=null;
@@ -1051,7 +1061,7 @@ $("tray").addEventListener("click",e=>{if(traySuppress){traySuppress=false;retur
 $("toolcancel").onclick=()=>setTool(null);
 $("crot").onclick=()=>{if(!ghost)return;if(COMP[ghost.type]){toast("공원과 시장은 돌리지 않아도 돼요.");return}ghost.dir=nextDir(ghost.dir,ghost.spr);ghost.manual=true};$("cok").onclick=confirmGhost;$("cno").onclick=cancelGhost;
 $("nextbtn").onclick=()=>{if(pulseOn==="next")pulseOn=null;nextSeason()};
-$("bookbtn").onclick=()=>book("todo");$("stats").addEventListener("click",e=>{if(e.target.closest("#gchip"))gradeInfo();else if(e.target.closest("#tdchip"))book("todo")});$("acctbtn").onclick=acctInfo;$("boastbtn").onclick=()=>boastOpen();$("bdg").onclick=titleList;$("sndbtn").onclick=sndPanel;$("evbtn").onclick=()=>{if(pulseOn==="event")pulseOn=null;eventOpen();update()};
+$("bookbtn").onclick=()=>book("todo");$("stats").addEventListener("click",e=>{if(e.target.closest("#ichip"))itemInfo();else if(e.target.closest("#gchip"))gradeInfo();else if(e.target.closest("#tdchip"))book("todo")});$("acctbtn").onclick=acctInfo;$("boastbtn").onclick=()=>boastOpen();$("bdg").onclick=titleList;$("sndbtn").onclick=sndPanel;$("evbtn").onclick=()=>{if(pulseOn==="event")pulseOn=null;eventOpen();update()};
 $("zin").onclick=()=>zoomAt(W/2,H/2,1.2);$("zout").onclick=()=>zoomAt(W/2,H/2,1/1.2);
 cv.addEventListener("wheel",e=>{e.preventDefault();const [wx0,wy0]=cvXY(e.clientX,e.clientY);zoomAt(wx0,wy0,e.deltaY<0?1.1:1/1.1)},{passive:false});
 const ALPHA={};
@@ -1954,7 +1964,7 @@ function markKnown(t){if(!S.knownB||!t)return;if(t==="folk"){coachHide();return}
 function newbList(){if(!S||!S.knownB)return [];return availBuilds().filter(t=>!S.knownB.includes(t))}
 let COACH=null;
 function coachHide(){COACH=null;const c=$("coach");if(c)c.hidden=true}
-function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof pubTick==="function")pubTick();if(typeof dripTick==="function")dripTick();if(typeof gradeHint==="function")gradeHint();if(typeof moneyTipTick==="function")moneyTipTick();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
+function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof pubTick==="function")pubTick();if(typeof dripTick==="function")dripTick();if(typeof gradeHint==="function")gradeHint();if(typeof moneyTipTick==="function")moneyTipTick();if(typeof noticeTick==="function")noticeTick();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
   const nb=newbList();if(!nb.length){el.hidden=true;return}const here=t=>!!document.querySelector('#tray .card[data-t="'+t+'"]');const t=nb.find(here)||nb[0];
   let target=null,txt="";
   if(here(t)){target=document.querySelector('#tray .card[data-t="'+t+'"]');txt="새로 지을 수 있어요: "+DEFS[t].nm+"! 여기를 눌러 보세요 👇"}
@@ -2625,7 +2635,7 @@ function fbInit(){const cfg=window.FIREBASE_CONFIG;if(!cfg||!cfg.apiKey)return P
 function start(data){
   S=(data&&data.b)?data:(load()||fresh());migrate();
   loadAll().then(()=>{TREE_KINDS.concat(["rock1","rock2"],Object.keys(MTM)).forEach(makeDim);$("loading").hidden=true;
-    window.addEventListener("resize",resize);resize();if(window.ResizeObserver)new ResizeObserver(()=>{if(stage.clientWidth!==W||stage.clientHeight!==H){resize();try{draw()}catch(e){}}}).observe(stage);update();requestAnimationFrame(frame);
+    window.addEventListener("resize",resize);window.addEventListener("resize",()=>{try{ichipFit()}catch(e){}});resize();if(window.ResizeObserver)new ResizeObserver(()=>{if(stage.clientWidth!==W||stage.clientHeight!==H){resize();try{draw()}catch(e){}}}).observe(stage);update();requestAnimationFrame(frame);
     acctShow('<p>마을 장부를 펴는 중…</p>');
     const use=window.claude&&typeof window.claude.use==="function"?window.claude.use("db").catch(()=>null):fbInit();
     Promise.race([use,new Promise(r=>setTimeout(()=>r(null),9000))]).then(db=>{ACCT.db=db||null;acctHome();try{playMark()}catch(e){}})})}
