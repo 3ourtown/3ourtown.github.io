@@ -840,6 +840,11 @@ function dripTick(){if(!S||!S.drip||!$("veil").hidden||!$("elder").hidden)return
   D.open.push(nx);D.last=nx;D.at=mIdx();save();update();tlAdd(DEFS[nx].nm+"을(를) 지을 수 있게 되었어요");
   say(DRIP_SAY[nx],()=>pulse(nx),"elder","h")}
 function dripWait(){return DRIP.find(t=>!dripOpen(t)&&baseVis(t))}
+function moneyTipTick(){if(!S||S.moneyTip||(S.tut||0)<3||(S.seasonsTotal||0)<1||!$("veil").hidden||!$("elder").hidden)return;S.moneyTip=1;save();
+  const ex=[10,30,50,100].map(n=>[n,Math.round(n*1.2)+5]);
+  modal("📢 이장님께 알림 · 마을 살림 돈",'<p><b>마을 살림 돈은 주민들이 내는 세금으로 모여요.</b> 집을 많이 지어 주민이 늘어날수록 다음 달에 들어오는 돈이 많아져요. 주민이 행복하면 돈이 더 많이 들어와요.</p>'+
+    '<div class="pact"><h4>주민이 늘면 한 달에 들어오는 돈</h4>'+ex.map(([n,m])=>'<div class="fbar"><div><span>주민 '+n+'명</span><b>약 '+m+'원</b></div><span class="tr"><i style="width:'+Math.round(m/125*100)+'%"></i></span></div>').join("")+'<p class="fine">행복이 60쯤일 때 예시예요. 행복이 높으면 더 많이 들어와요.</p></div>'+
+    '<p>처음에는 돈이 조금씩 들어오지만, 주민이 늘면 금방 넉넉해져요. <b>참을성 있게 마을을 키워 보세요!</b></p><p class="fine">지금 우리 마을: 주민 '+pop()+'명 · 행복 '+Math.round(S.happy)+' · 다음 달 살림 돈 약 '+(Math.round(pop()*2*S.happy/100)+5)+'원</p>',[{t:"알겠어요!"}])}
 function pubTick(){if(!S||!S.unlocked||!S.pubSeq||!$("veil").hidden||!$("elder").hidden)return;const nx=pubNext(),k=nx||"done";if(S.pubTold===k)return;
   if(!S.pubTold){S.pubTold="police";return}S.pubTold=k;save();const NM={fire:"소방서",hospital:"병원",school:"학교"};
   if(nx)say("좋아! 이제 "+NM[nx]+"도 지을 수 있다네. "+(nx==="fire"?"불이 나면 달려와 줄 소방서를 지어 보게.":nx==="hospital"?"아픈 주민이 치료받을 병원을 지어 보게.":"아이들이 배우고 친구를 만날 학교를 지어 보게."),()=>pulse(nx));
@@ -847,7 +852,7 @@ function pubTick(){if(!S||!S.unlocked||!S.pubSeq||!$("veil").hidden||!$("elder")
 function lockMsg(t){if(!S.unlocked)return "이장 Lv "+UNLOCK.lv+", 주민 "+UNLOCK.pop+"명이 되면 열려요.";const nx=pubNext();return DEFS[nx].nm+"을(를) 먼저 지으면 열려요."}
 function isLocked(type){return (DEFS[type].pub&&!S.unlocked)||pubWait(type)}
 function spend(o){if(!DEV){S.money-=o.m;S.wood-=o.w}}
-function lackMsg(o){return S.money<o.m?"돈이 부족해요. 다음 달에 마을 살림 돈이 들어와요.":"나무가 부족해요. 벌목장에서 나무를 거둬요."}
+function lackMsg(o){return S.money<o.m?"돈이 부족해요. 집을 지어 주민을 늘리면 다음 달에 돈이 더 많이 들어와요!":"나무가 부족해요. 벌목장에서 나무를 거둬요."}
 function place(r,c){
   const d=DEFS[tool],dc=costOf(tool);if(!afford(dc)){toast(lackMsg(dc));return}
   const ok=canPlace(tool,r,c);if(!ok.ok){toast(ok.why);return}
@@ -905,7 +910,7 @@ function nextSeason(){
   S.month=S.month%12+1;if(S.month===3)S.year++;S.season=SEASON_OF(S.month);S.seasonsTotal++;if(S.tut===2)S.tut=3;
   S.nextAt=S.seasonsTotal>=4?Date.now()+MONTH_MS:0;
   checkUnlock();checkWishes();S.happy=calcHappy();if(typeof myeongMonth==="function"){myeongMonth();setTimeout(noriHint,2500);if(typeof bongMonth==="function")bongMonth();setTimeout(()=>{if($("elder").hidden)bongHint()},6000)}
-  const lines=(mu?["박물관 관람 수입 +"+mu]:[]).concat(fo?["민속마을 관광 수입 +"+fo]:[]).concat(dz?["공룡 놀이공원 관람 수입 +"+dz]:[]).concat(["마을 살림 돈 +"+(tax+mk)+(mk?" (시장 수입 "+mk+" 포함)":"")],uk?["공공시설 유지비 −"+uk+" (시설 "+(uk/2)+"곳 × 2, 세금으로 운영해요)"]:[],S.mev?[MEV[S.mev.id].ico+" "+MEV[S.mev.id].msg+" 마을에서 "+MEV[S.mev.id].ico+" 표시를 찾아 해결해요"]:[],["새 주민 +"+Math.max(0,p-before+left)]);
+  const lines=(mu?["박물관 관람 수입 +"+mu]:[]).concat(fo?["민속마을 관광 수입 +"+fo]:[]).concat(dz?["공룡 놀이공원 관람 수입 +"+dz]:[]).concat(["마을 살림 돈 +"+(tax+mk)+" (주민 "+p+"명 · 행복 "+Math.round(S.happy)+(mk?" · 시장 수입 "+mk+" 포함":"")+")"],uk?["공공시설 유지비 −"+uk+" (시설 "+(uk/2)+"곳 × 2, 세금으로 운영해요)"]:[],S.mev?[MEV[S.mev.id].ico+" "+MEV[S.mev.id].msg+" 마을에서 "+MEV[S.mev.id].ico+" 표시를 찾아 해결해요"]:[],["새 주민 +"+Math.max(0,p-before+left)]);
   if(S.nextAt)lines.push("다음 달은 3분 30초 뒤에 올 수 있어요. 그동안 나무를 거두고 집을 가꿔 보세요.");
   if(left)lines.push("행복하지 않은 주민 "+left+"명이 이사를 떠났어요. 집은 그대로 남아요.");
   else if(S.happy<40)lines.push("주민들 표정이 어두워요. 소원을 들어주지 않으면 이사를 갈지도 몰라요.");
@@ -1949,7 +1954,7 @@ function markKnown(t){if(!S.knownB||!t)return;if(t==="folk"){coachHide();return}
 function newbList(){if(!S||!S.knownB)return [];return availBuilds().filter(t=>!S.knownB.includes(t))}
 let COACH=null;
 function coachHide(){COACH=null;const c=$("coach");if(c)c.hidden=true}
-function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof pubTick==="function")pubTick();if(typeof dripTick==="function")dripTick();if(typeof gradeHint==="function")gradeHint();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
+function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof pubTick==="function")pubTick();if(typeof dripTick==="function")dripTick();if(typeof gradeHint==="function")gradeHint();if(typeof moneyTipTick==="function")moneyTipTick();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
   const nb=newbList();if(!nb.length){el.hidden=true;return}const here=t=>!!document.querySelector('#tray .card[data-t="'+t+'"]');const t=nb.find(here)||nb[0];
   let target=null,txt="";
   if(here(t)){target=document.querySelector('#tray .card[data-t="'+t+'"]');txt="새로 지을 수 있어요: "+DEFS[t].nm+"! 여기를 눌러 보세요 👇"}
