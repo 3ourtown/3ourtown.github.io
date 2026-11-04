@@ -31,6 +31,7 @@
 button,.card,.brand{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .fbar{margin:8px 0}.fbar>div{display:flex;justify-content:space-between;font-size:14px;margin-bottom:3px}.fbar i{display:block;height:10px;border-radius:999px;background:linear-gradient(90deg,#e9a92c,#f3c96a);box-shadow:inset 0 0 0 1px #0001}.fbar .tr{display:block;background:#efe5cf;border-radius:999px;overflow:hidden}.fbar.ok i{background:linear-gradient(90deg,#2f7a55,#5fae7f)}
 .fbar::after{content:"";display:block}
+.fbar.ok i{background:linear-gradient(90deg,#2f7a55,#5aa77c)}.gtip{margin:4px 0 0!important;font-size:12.5px;color:#6f5a2a;line-height:1.4!important}.gsub{display:flex;flex-direction:column;gap:2px;margin-top:5px;font-size:12.5px;color:#4b4436}.glist{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:6px 0;font-size:13px;color:#8a7f6a}.glist .ok{color:var(--pine);font-weight:700}.glist i{font-style:normal;color:#c4b89c}.gpr{font-weight:400;color:#8a5a00;font-size:12px}
 .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}.fcell{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);border-radius:10px;padding:6px;background:#fff;opacity:.55;font-size:13px}.fcell.on{opacity:1;border-color:#2f7a55}.fcell img{height:54px}.fcell span{font-size:11px;color:#6f675a}
 .mfest{display:flex;flex-direction:column;gap:2px;background:#fff3cf;border:1px solid #e9c46a;border-radius:12px;padding:8px 12px;margin-bottom:8px}.mfest span{font-size:13px;color:#6f675a}
 .noribtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 10px}.noribtns button{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px;font:inherit}.noribtns img{height:58px}.noribtns span{font-size:12px;color:#6f675a}
@@ -300,7 +301,7 @@ canvas#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;dis
   .brand{display:none}
   .stats{flex-wrap:nowrap;overflow-x:auto;gap:4px;order:0;flex-basis:auto;scrollbar-width:none}.stats::-webkit-scrollbar{display:none}
   .chip{padding:1px 7px;font-size:13px;gap:3px;border-radius:8px}.chip .k{display:none}.chip img,.chip .ico{width:16px;height:16px}
-  #gchip{display:none}.tdchip b{display:none}
+  #gchip b{display:none}.tdchip b{display:none}
   .level{gap:4px}.level b{font-size:12px;padding:1px 6px}.xpbar{width:36px!important}.bdg{height:20px}
   .acctbtn{padding:2px 7px;font-size:11px}
   .bottom{padding-block:3px;gap:6px}
@@ -1045,7 +1046,7 @@ $("tray").addEventListener("click",e=>{if(traySuppress){traySuppress=false;retur
 $("toolcancel").onclick=()=>setTool(null);
 $("crot").onclick=()=>{if(!ghost)return;if(COMP[ghost.type]){toast("공원과 시장은 돌리지 않아도 돼요.");return}ghost.dir=nextDir(ghost.dir,ghost.spr);ghost.manual=true};$("cok").onclick=confirmGhost;$("cno").onclick=cancelGhost;
 $("nextbtn").onclick=()=>{if(pulseOn==="next")pulseOn=null;nextSeason()};
-$("bookbtn").onclick=()=>book("todo");$("stats").addEventListener("click",e=>{if(e.target.closest("#gchip")||e.target.closest("#tdchip"))book("todo")});$("acctbtn").onclick=acctInfo;$("boastbtn").onclick=()=>boastOpen();$("bdg").onclick=titleList;$("sndbtn").onclick=sndPanel;$("evbtn").onclick=()=>{if(pulseOn==="event")pulseOn=null;eventOpen();update()};
+$("bookbtn").onclick=()=>book("todo");$("stats").addEventListener("click",e=>{if(e.target.closest("#gchip"))gradeInfo();else if(e.target.closest("#tdchip"))book("todo")});$("acctbtn").onclick=acctInfo;$("boastbtn").onclick=()=>boastOpen();$("bdg").onclick=titleList;$("sndbtn").onclick=sndPanel;$("evbtn").onclick=()=>{if(pulseOn==="event")pulseOn=null;eventOpen();update()};
 $("zin").onclick=()=>zoomAt(W/2,H/2,1.2);$("zout").onclick=()=>zoomAt(W/2,H/2,1/1.2);
 cv.addEventListener("wheel",e=>{e.preventDefault();const [wx0,wy0]=cvXY(e.clientX,e.clientY);zoomAt(wx0,wy0,e.deltaY<0?1.1:1/1.1)},{passive:false});
 const ALPHA={};
@@ -1465,7 +1466,7 @@ async function fbList(){let rows=[],src="";
     [{t:"이 기기 글 지우기",ghost:true,keep:true,f:el=>{if(el.dataset.sure){try{localStorage.removeItem("ijang-fb")}catch(e){}toast("이 기기에 남은 글을 지웠어요");fbList()}else{el.dataset.sure="1";el.textContent="정말 지울까요?"}}},{t:"닫기"}])}
 
 /* ---------- 마을 등급 ---------- */
-const GRADES=[{nm:"작은 마을"},{nm:"마을",lv:4,pop:20},{nm:"행복한 마을",pop:100,happy:70,h2:true},{nm:"최고의 마을",pop:150,happy:80,pact:true}];
+const GRADES=[{nm:"작은 마을"},{nm:"마을",lv:4,pop:20},{nm:"행복한 마을",pop:100,happy:70,h2:true},{nm:"최고의 마을",pop:200,happy:75,pact:true}];
 function gradeNeed(g){const G=GRADES[g];if(!G)return [];const a=[];
   if(G.lv)a.push(["이장 Lv "+G.lv,S.level>=G.lv]);if(G.pop)a.push(["주민 "+G.pop+"명",pop()>=G.pop]);if(G.happy)a.push(["행복 "+G.happy,S.happy>=G.happy]);
   if(G.h2)a.push(["'우리 마을의 옛이야기' 마치기",!!(S.h2&&S.h2.done)]);if(G.pact)a.push(["우리 마을의 약속 3개 모두 지키기",!!(S.conds&&S.condMet&&S.conds.every(i=>S.condMet.includes(i)))]);return a}
@@ -1488,11 +1489,28 @@ function storyInfo(){const s=h2Steps(),L=["옛 물건 발견","발굴 현장 짓
      s.go==="dig"?[{t:"발굴 현장 보기",f:()=>{const d=bList().find(x=>x.type==="digsite");if(d){centerOn(d.r+1,d.c+1);clampView()}}}]:s.go==="quest"&&S.h2.quest?[{t:"❓ 집으로 가기",f:()=>{const[r,c]=S.h2.quest.k.split(",").map(Number);centerOn(r,c);clampView()}}]:[]).concat([{t:"닫기",ghost:true}]))}
 function storyChip(){const H=S.h2;if(!H||H.done||!H.st)return "";const s=h2Steps();return '<button class="chip gchip" id="schip" title="우리 마을의 옛이야기"><span aria-hidden="true">📜</span><span class="k">옛이야기</span> <b>'+s.n+'/6</b></button>'}
 function todoChip(){const C=chapter();const gnm=GRADES[S.grade||0].nm;
-  return '<button class="chip gchip" id="gchip" title="마을 등급 · 누르면 마을 수첩"><span aria-hidden="true">🏠</span><b>'+gnm+'</b></button><button class="chip tdchip" id="tdchip" title="지금 할 일 · 누르면 마을 수첩"><span aria-hidden="true">📖</span><span class="k">지금 할 일</span> <b>'+(C.i<8?CHAP[C.i][0]+" "+CHAP[C.i][1]:"🎓 졸업 후")+'</b></button>'}
+  return '<button class="chip gchip" id="gchip" title="마을 등급 · 누르면 다음 등급까지 남은 조건"><span aria-hidden="true">🏠</span><b>'+gnm+'</b>'+(GRADES[(S.grade||0)+1]?(()=>{const L=gradeLeft();return ' <small class="gpr">→ '+L.n+'/'+L.P.length+'</small>'})():'')+'</button><button class="chip tdchip" id="tdchip" title="지금 할 일 · 누르면 마을 수첩"><span aria-hidden="true">📖</span><span class="k">지금 할 일</span> <b>'+(C.i<8?CHAP[C.i][0]+" "+CHAP[C.i][1]:"🎓 졸업 후")+'</b></button>'}
 function gradeChip(){const g=S.grade||0,nx=GRADES[g+1];let sub="";if(nx){const p=gradeNeed(g+1).find(x=>/주민/.test(x[0]));sub=nx.nm+"까지 "+(p?"주민 "+pop()+"/"+(GRADES[g+1].pop):"")}
   return '<button class="chip gchip" id="gchip" title="마을 등급"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17V9l7-5 7 5v8z" fill="#e9a92c" stroke="#8a5a00"/><path d="M8 17v-5h4v5" fill="#fff3cf" stroke="#8a5a00"/></svg><b>'+GRADES[g].nm+'</b>'+(sub?' <span class="k">'+sub+'</span>':'')+'</button>'}
-function gradeInfo(){const g=S.grade||0;
-  modal("마을 등급",GRADES.map((G,i)=>'<div class="pc'+(i<=g?" ok":"")+'" style="border-top:1px dashed #e6dcc6;padding:7px 0"><b>'+(i<=g?"✓ ":"")+G.nm+(i===g?" · 지금":"")+'</b>'+(i>g?'<span>'+gradeNeed(i).map(([t,v])=>(v?"✓ ":"○ ")+t).join(" · ")+'</span>':'')+'</div>').join("")+'<p class="fine">한번 오른 등급은 내려가지 않아요. 하지만 주민이 떠나면 마을이 쓸쓸해져요.</p>'+((S.grade||0)<2&&!(S.h2&&S.h2.done)?'<div class="mfest"><b>📜 옛이야기 다음 할 일</b><span>'+h2Steps().t+'</span></div>':''),((S.grade||0)<2&&!(S.h2&&S.h2.done)&&S.h2&&S.h2.st?[{t:"옛이야기 자세히",ghost:true,f:()=>setTimeout(storyInfo,50)}]:[]).concat([{t:"닫기"}]))}
+function gradeProg(g){const G=GRADES[g];if(!G)return [];const a=[];
+  if(G.lv)a.push({t:"이장 레벨",v:S.level,m:G.lv,pre:"Lv ",tip:"건물을 짓고 주민 소원을 들어주면 경험치가 올라요."});
+  if(G.pop)a.push({t:"주민",v:pop(),m:G.pop,suf:"명",tip:"집을 더 짓거나, 2층집·빌라·아파트처럼 큰 집을 지어요. 행복이 45 이상이어야 이사 와요."});
+  if(G.happy)a.push({t:"행복",v:Math.round(S.happy),m:G.happy,tip:"공원·놀이터·마당 있는 집·한옥을 짓고, 주민 소원을 들어줘요. 마을이 커지면 행복이 조금씩 줄어요."});
+  if(G.h2){const st=h2Steps();a.push({t:"우리 마을의 옛이야기",v:st.n,m:6,tip:st.t})}
+  if(G.pact){if(!S.conds)a.push({t:"우리 마을의 약속",v:0,m:3,tip:S.unlocked&&pubDone()?"마을회관에서 살기 좋은 마을의 조건 3개를 골라요.":"공공기관 네 곳을 다 지으면 약속을 정해요."});
+    else{const met=S.conds.filter(i=>(S.condMet||[]).includes(i));a.push({t:"우리 마을의 약속",v:met.length,m:3,
+      sub:S.conds.map(id=>{const c=CONDS.find(x=>x.id===id),ok=met.includes(id);return (ok?"✓ ":"○ ")+c.ic+" "+c.nm+(ok?"":" — "+c.chk().filter(x=>!x[1]).map(x=>x[0]).join(", ")+" 필요")}),
+      tip:"○ 약속에 적힌 것을 지으면 약속을 지켜요."})}}
+  a.forEach(x=>x.ok=x.v>=x.m);return a}
+function gradeLeft(){const g=S.grade||0,P=gradeProg(g+1);return{g,P,n:P.filter(x=>x.ok).length}}
+function gradeInfo(){const g=S.grade||0,nx=GRADES[g+1],P=gradeProg(g+1);
+  const bar=x=>'<div class="fbar'+(x.ok?" ok":"")+'"><div><span>'+(x.ok?"✓ ":"")+x.t+'</span><b>'+(x.pre||"")+x.v+' / '+x.m+(x.suf||"")+'</b></div><span class="tr"><i style="width:'+Math.min(100,Math.round(x.v/x.m*100))+'%"></i></span>'+
+    (x.sub?'<div class="gsub">'+x.sub.map(t=>'<span>'+t+'</span>').join("")+'</div>':'')+(x.ok?'':'<p class="gtip">💡 '+x.tip+'</p>')+'</div>';
+  const head=nx?'<div class="pact"><h4>다음 등급: '+nx.nm+' ('+P.filter(x=>x.ok).length+'/'+P.length+')</h4>'+P.map(bar).join("")+'<p class="fine">조건을 모두 한꺼번에 채우면 등급이 올라요.</p></div>':'<div class="pact"><h4>🏆 최고의 마을이에요!</h4><p class="fine">가장 높은 등급이에요. 졸업 앨범을 채워 졸업장을 받아요.</p></div>';
+  modal("마을 등급 · 지금 "+GRADES[g].nm,head+'<div class="glist">'+GRADES.map((G,i)=>'<span class="'+(i<=g?"ok":"")+'">'+(i<=g?"✓ ":"")+G.nm+'</span>').join('<i>›</i>')+'</div><p class="fine">한번 오른 등급은 내려가지 않아요.</p>',[{t:"마을 수첩",ghost:true,f:()=>setTimeout(()=>book("todo"),50)},{t:"닫기"}])}
+function gradeHint(){if(!S||!S.unlocked||!$("veil").hidden||!$("elder").hidden)return;const L=gradeLeft();if(L.g<1||!L.P.length)return;const miss=L.P.filter(x=>!x.ok);if(miss.length!==1)return;
+  const k=(L.g+1)+":"+miss[0].t;if(S.gHint===k)return;S.gHint=k;save();const x=miss[0];
+  say(GRADES[L.g+1].nm+"까지 '"+x.t+"'만 남았구먼! 지금 "+(x.pre||"")+x.v+", 목표는 "+(x.pre||"")+x.m+(x.suf||"")+"이라네. "+x.tip,null,"elder","h")}
 
 /* ---------- 마을 연표 ---------- */
 function jo(w,a,b){const c=w.charCodeAt(w.length-1)-44032;return w+(c>=0&&c<11172&&c%28?a:b)}
@@ -1931,7 +1949,7 @@ function markKnown(t){if(!S.knownB||!t)return;if(t==="folk"){coachHide();return}
 function newbList(){if(!S||!S.knownB)return [];return availBuilds().filter(t=>!S.knownB.includes(t))}
 let COACH=null;
 function coachHide(){COACH=null;const c=$("coach");if(c)c.hidden=true}
-function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof pubTick==="function")pubTick();if(typeof dripTick==="function")dripTick();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
+function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof pubTick==="function")pubTick();if(typeof dripTick==="function")dripTick();if(typeof gradeHint==="function")gradeHint();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
   const nb=newbList();if(!nb.length){el.hidden=true;return}const here=t=>!!document.querySelector('#tray .card[data-t="'+t+'"]');const t=nb.find(here)||nb[0];
   let target=null,txt="";
   if(here(t)){target=document.querySelector('#tray .card[data-t="'+t+'"]');txt="새로 지을 수 있어요: "+DEFS[t].nm+"! 여기를 눌러 보세요 👇"}
