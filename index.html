@@ -1933,10 +1933,10 @@ function sortGame(){const ALL=[["가마","r_gama",0],["소달구지","r_ox",0],[
 /* 나룻배와 여객선: 강을 번갈아 오가요 */
 let SHIPHIT=null;
 let SHIPD=null;
-function boatAt(r,side,e,dir,names,wf,c0,sp,defer){c0=c0==null?-.3:c0;sp=sp||2.6;const z=view.z,rc=riv(r),c=rc+c0+(side?1-e:e)*sp,p=wpos(r+.5,c);const fr=Math.floor(tAnim/450)%2,go=side?dir<0:dir>0;
+function boatAt(r,side,e,dir,names,wf,c0,sp,defer,flip){c0=c0==null?-.3:c0;sp=sp||2.6;const z=view.z,rc=riv(r),c=rc+c0+(side?1-e:e)*sp,p=wpos(r+.5,c);const fr=Math.floor(tAnim/450)%2,go=side?dir<0:dir>0;
   const name=go?names[0][fr%names[0].length]:names[1][fr%names[1].length];const im=IMG[name],m=META[name];if(!im){need(name);return null}
   const bob=dir?0:Math.sin(tAnim/600)*1.2;const w=TW*wf,h=w*m.h/m.w,x=p.x*z+view.x,y=p.y*z+view.y+bob*z;
-  const f=()=>{ctx.save();ctx.translate(x,y+4*z);ctx.scale(-1,1);ctx.drawImage(im,-w*z/2,-h*z,w*z,h*z);ctx.restore()};
+  const f=()=>{ctx.save();ctx.translate(x,y+4*z);if(flip||!go)ctx.scale(-1,1);ctx.drawImage(im,-w*z/2,-h*z,w*z,h*z);ctx.restore()};
   if(defer){SHIPD={r,c,f}}else f();return{x,y:y-h*z/2,w:w*z,h:h*z}}
 function legPos(t){const go=t<.5,k=go?t*2:(1-t)*2,e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;return{e,dir:go?1:-1}}
 function drawBoat(){SHIPHIT=null;SHIPD=null;const T=S.trans;const nb=T&&T.v&&T.v.boat?bList().find(b=>b.type==="naru"&&!b.building):null;const pb=bList().find(b=>b.type==="pier"&&!b.building);
@@ -1946,7 +1946,7 @@ function drawBoat(){SHIPHIT=null;SHIPD=null;const T=S.trans;const nb=T&&T.v&&T.v
   const per=14000,cyc=Math.floor(tAnim/per)%2,t=(tAnim%per)/per,L=legPos(t);
   const pSide=inFolk(pb.r,pb.c)?1:0;
   if(nb){if(cyc===0)boatAt(nb.r,bSide,L.e,L.dir,BN,.62);else boatAt(nb.r,bSide,0,0,BN,.62)}
-  const run=!nb||cyc===1;SHIPHIT=run?boatAt(pb.r+.15,pSide,L.e,L.dir,SN,.75,.95,1.25,1):boatAt(pb.r+.15,pSide,0,0,SN,.75,.95,1.25,1)}
+  const run=!nb||cyc===1;SHIPHIT=run?boatAt(pb.r+1,pSide,L.e,L.dir,SN,.75,.85,1.35,1,1):boatAt(pb.r+1,pSide,0,0,SN,.75,.85,1.35,1,1)}
 function shipAt(x,y){const h=SHIPHIT;return h&&Math.abs(x-h.x)<h.w*.45&&Math.abs(y-h.y)<h.h*.45}
 function pierTick(){if(!S||!$("veil").hidden||!$("elder").hidden)return;
   if(baseVis("pier")&&!S.pierAnn){S.pierAnn=1;save();update();tlAdd("선착장을 지을 수 있게 되었어요");
