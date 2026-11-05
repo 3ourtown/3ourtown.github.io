@@ -2607,10 +2607,10 @@ function acctNewForm(){
   $("a_back").onclick=()=>acctHome();$("a_nick").focus();
   $("a_go").onclick=async()=>{const nick=$("a_nick").value.trim(),pin=$("a_pin").value.trim(),m=$("a_msg");
     const bad=nickOk(nick);if(bad){m.textContent=bad;return}if(!/^\d{4}$/.test(pin)){m.textContent="비밀번호는 숫자 4자리예요.";return}
-    $("a_go").disabled=true;m.textContent="아이디를 만드는 중…";
-    try{const col=ACCT.db.collection("villages");const q=await col.where("nick","==",nick).get();let num=1;q.docs.forEach(d=>{const v=d.data();if(v&&v.num>=num)num=v.num+1});
+    $("a_go").disabled=true;const step=(n,t)=>{m.innerHTML='<b>'+n+'/3</b> '+t};step(1,"서버에 연결하는 중…");
+    try{const col=ACCT.db.collection("villages");const q=await col.where("nick","==",nick).get();step(2,"빈 번호 찾는 중…");let num=1;q.docs.forEach(d=>{const v=d.data();if(v&&v.num>=num)num=v.num+1});
       let id;for(;;){id=docIdOf(nick,num);const ex=await col.doc(id).get();if(!ex.exists)break;num++}
-      S=fresh();migrate();const ref=col.doc(id);await ref.set({nick,num,pin:await pinHash(id,pin),save:JSON.stringify(S),at:Date.now(),made:Date.now()});
+      step(3,"마을 저장하는 중…");S=fresh();migrate();const ref=col.doc(id);await ref.set({nick,num,pin:await pinHash(id,pin),save:JSON.stringify(S),at:Date.now(),made:Date.now()});
       ACCT.ref=ref;ACCT.id=id;ACCT.nick=nick;ACCT.num=num;try{localStorage.setItem("ijang-last",JSON.stringify({nick,num}))}catch(e){}save();
       acctShow('<h2>새 마을이 생겼어요!</h2><p>내 아이디와 비밀번호를 <b>수첩에 꼭 적어 두세요.</b> 다른 기기에서도 이어 할 수 있어요.</p><div class="aid"><span>아이디</span><b>'+nick+'#'+num+'</b><span>비밀번호</span><b>'+pin+'</b></div><div class="abtns"><button id="a_ok" class="big">적었어요, 시작!</button></div>');
       $("a_ok").onclick=()=>{$("acct").hidden=true;afterLogin()}}
