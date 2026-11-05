@@ -478,7 +478,7 @@ const COMP={
   fest:{items:[["f_stage",1,1,.98],["f_booth1",1,2,.98],["f_booth2",2,1,.98],["f_crafts",2,2,.98]]},
   nori:{items:[["c_daljip",.42,.42,.5],["c_kite",.5,1.55,.36],["c_yut",.95,1.0,.62],["c_seesaw",1.55,.5,.56],["c_tuho",1.55,1.5,.5],["c_table",1.78,1.05,.44]]},
   market:{items:[["m_stall1",.92,.68,.68],["m_stall2",.68,1.3,.68],["m_crates",1.45,1.75,.32],["m_baskets",1.62,.62,.42],["m_sacks",1.78,1.32,.42]]}};
-const ORDER=["house","lumber","playground","park","market","school","hospital","fire","police","digsite","museum","busstop","senior","daycare","multi","worldfood","locker","recycle","fest","aigreen","post"];
+const ORDER=["house","lumber","playground","park","market","school","hospital","fire","police","digsite","museum","busstop","pier","senior","daycare","multi","worldfood","locker","recycle","fest","aigreen","post"];
 function trayVis(t){return baseVis(t)&&(!DRIP.includes(t)||dripOpen(t))}
 function baseVis(t){const us=(S.u3&&S.u3.st)||0;if(t==="pier")return transOpen()&&OLDV.every(o=>tr().v[o.id]);if(t==="aigreen")return us>=2;if(t==="post")return !!((S.bong&&S.bong.first)||Object.keys(S.comm||{}).length);if(t==="senior"||t==="daycare")return us>=1;if(t==="multi"||t==="worldfood"||t==="locker")return us>=2;if(t==="recycle")return !!S.unlocked;if(t==="fest")return us>=3;return t==="busstop"?transOpen():t==="digsite"?!!(S.h2&&S.h2.st>=1):t==="museum"?!!(S.h2&&S.h2.st>=4):true}
 const UNLOCK={lv:4,pop:20};
