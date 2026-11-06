@@ -923,7 +923,7 @@ function nextSeason(){
    if(left){addNote("move");S.leftMsg=left}}
   sfx("coin");const p=pop(),tax=Math.round(p*2*S.happy/100)+5,mk=Math.min(2,count("market"))*10,uk=upkeep();S.money+=tax+mk;S.money=Math.max(0,S.money-uk);if(typeof mevMonth==="function")mevMonth();const mu=h2Month();S.money+=mu;if(typeof growSaplings==="function")growSaplings();const fo=folkIncome();S.money+=fo;const dz=count("dinopark")*20;S.money+=dz;if(typeof farmMonth==="function")farmMonth();
   S.month=S.month%12+1;if(S.month===3)S.year++;S.season=SEASON_OF(S.month);S.seasonsTotal++;if(S.tut===2)S.tut=3;
-  S.nextAt=S.seasonsTotal>=4?Date.now()+MONTH_MS:0;
+  S.nextAt=S.seasonsTotal>=4?Date.now()+MONTH_MS:0;setTimeout(()=>{if(ACCT.ref)cloudSave(true)},1500);
   checkUnlock();checkWishes();S.happy=calcHappy();if(typeof myeongMonth==="function"){myeongMonth();setTimeout(noriHint,2500);if(typeof bongMonth==="function")bongMonth();setTimeout(()=>{if($("elder").hidden)bongHint()},6000)}
   const lines=(mu?["박물관 관람 수입 +"+mu]:[]).concat(fo?["민속마을 관광 수입 +"+fo]:[]).concat(dz?["공룡 놀이공원 관람 수입 +"+dz]:[]).concat(["마을 살림 돈 +"+(tax+mk)+" (주민 "+p+"명 · 행복 "+Math.round(S.happy)+(mk?" · 시장 수입 "+mk+" 포함":"")+")"],uk?["공공시설 유지비 −"+uk+" (시설 "+(uk/2)+"곳 × 2, 세금으로 운영해요)"]:[],S.mev?[MEV[S.mev.id].ico+" "+MEV[S.mev.id].msg+" 마을에서 "+MEV[S.mev.id].ico+" 표시를 찾아 해결해요"]:[],["새 주민 +"+Math.max(0,p-before+left)]);
   if(S.nextAt)lines.push("다음 달은 3분 30초 뒤에 올 수 있어요. 그동안 나무를 거두고 집을 가꿔 보세요.");
@@ -2210,7 +2210,7 @@ function zoomView(src){let el=$("bzoom");if(!el){el=document.createElement("div"
   w.onpointermove=e=>{if(pts.has(e.pointerId))pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pinch&&pts.size===2){const [a,b]=[...pts.values()],r=w.getBoundingClientRect();set(pinch.z*Math.hypot(a.x-b.x,a.y-b.y)/pinch.d,(a.x+b.x)/2-r.left,(a.y+b.y)/2-r.top)}else if(drag){w.scrollLeft=drag.sl-(e.clientX-drag.x);w.scrollTop=drag.st-(e.clientY-drag.y)}};
   const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;drag=null};w.onpointerup=up;w.onpointercancel=up;
   w.onwheel=e=>{{e.preventDefault();const r=w.getBoundingClientRect();set(z*(e.deltaY<0?1.15:1/1.15),e.clientX-r.left,e.clientY-r.top)}}}
-function boastClose(){if($("bzoom"))$("bzoom").hidden=true;BOAST_UNSUB.forEach(f=>{try{f()}catch(e){}});BOAST_UNSUB=[]}
+function boastClose(){BOAST_LIVE=null;if($("bzoom"))$("bzoom").hidden=true;BOAST_UNSUB.forEach(f=>{try{f()}catch(e){}});BOAST_UNSUB=[]}
 function bProf(){try{return JSON.parse(localStorage.getItem("ijang-bprof")||"null")||{}}catch(e){return{}}}
 function bProfSet(p){try{localStorage.setItem("ijang-bprof",JSON.stringify(p))}catch(e){}}
 function ymd(t){const d=new Date(t);return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")}
@@ -2238,9 +2238,9 @@ function boastOpen(){if(!ACCT.db){modal("마을 자랑하기",'<p>마을 자랑�
     if($("bback"))$("bback").onclick=()=>{openId=null;render()};
     $("bwall").querySelectorAll(".bzimg").forEach(im=>im.onclick=()=>zoomView(im.src));
     $("bwall").querySelectorAll("[data-k]").forEach(b=>b.onclick=async()=>{const id=b.dataset.p+"_"+me+"_"+b.dataset.k;const ref=ACCT.db.collection("cheers").doc(id);b.disabled=true;
-      try{if(b.classList.contains("on"))await ref.delete();else{await ref.set({post:b.dataset.p,kind:+b.dataset.k,by:me,at:Date.now(),expireAt:bExpire(Date.now())});sfx("good")}}catch(e){toast("지금은 응원을 보낼 수 없어요")}b.disabled=false});
+      try{const P=b.dataset.p,K=+b.dataset.k;if(b.classList.contains("on")){await ref.delete();cheers=cheers.filter(c=>!(c.post===P&&c.kind===K&&c.by===me))}else{const at=Date.now();await ref.set({post:P,kind:K,by:me,at,expireAt:bExpire(at)});cheers=cheers.concat({post:P,kind:K,by:me,at});sfx("good")}bcSync();render()}catch(e){toast("지금은 응원을 보낼 수 없어요");b.disabled=false}});
     $("bwall").querySelectorAll("[data-mine],[data-del]").forEach(b=>b.onclick=async()=>{if(!b.dataset.sure){b.dataset.sure=1;b.textContent="정말 내릴까요? 한 번 더 눌러요";return}
-      try{await ACCT.db.collection("boast").doc(b.dataset.mine||b.dataset.del).delete();openId=null;toast("자랑을 내렸어요")}catch(e){toast("내리지 못했어요")}})};
+      try{const id=b.dataset.mine||b.dataset.del;await ACCT.db.collection("boast").doc(id).delete();posts=posts.filter(p=>p.id!==id);bcSync();openId=null;render();toast("자랑을 내렸어요")}catch(e){toast("내리지 못했어요")}})};
   const phHTML=()=>myOk.map(p=>'<button class="bph'+(picks.includes(p[0])?" on":"")+'" data-ph="'+p[0]+'">'+p[1]+'</button>').join("")+(myOk.length<BOAST_PH.length?'<span class="fine">마을을 더 가꾸면 자랑할 거리가 '+(BOAST_PH.length-myOk.length)+'개 더 열려요</span>':'');
   const today=ymd(Date.now()),posted=(()=>{try{return localStorage.getItem("ijang-bday-"+me)===today}catch(e){return false}})();
   $("modal").innerHTML='<button class="mclose" id="bx" aria-label="닫기">✕ 닫기</button><h2>📸 마을 자랑하기</h2>'+
@@ -2258,13 +2258,21 @@ function boastOpen(){if(!ACCT.db){modal("마을 자랑하기",'<p>마을 자랑�
     if(!shot){$("bmsg").textContent="사진을 찍지 못했어요.";return}if(!school||!nick){$("bmsg").textContent="학교와 별명을 적어 주세요.";return}if(!picks.length){$("bmsg").textContent="자랑할 것을 하나 이상 골라 주세요.";return}
     if(/\d{3,}/.test(nick+school)){$("bmsg").textContent="숫자로 된 개인 정보는 쓰지 마세요.";return}
     bProfSet({school,year,nick});$("bpost").disabled=true;$("bmsg").textContent="올리는 중…";const at=Date.now();
-    try{await ACCT.db.collection("boast").doc("b-"+me+"-"+today).set({uid:me,img:shot,texts:picks.slice(0,3),school:school.slice(0,12),year,nick:nick.slice(0,8),vgrade:GRADES[S.grade||0].nm,pop:pop(),at,expireAt:bExpire(at),hidden:false});
+    try{const doc={uid:me,img:shot,texts:picks.slice(0,3),school:school.slice(0,12),year,nick:nick.slice(0,8),vgrade:GRADES[S.grade||0].nm,pop:pop(),at,expireAt:bExpire(at),hidden:false};await ACCT.db.collection("boast").doc("b-"+me+"-"+today).set(doc);posts=[{id:"b-"+me+"-"+today,...doc}].concat(posts.filter(p=>p.id!=="b-"+me+"-"+today));bcSync();render();
       try{localStorage.setItem("ijang-bday-"+me,today)}catch(e){}sfx("level");$("bmsg").textContent="자랑을 올렸어요! 일주일 동안 다른 친구들이 볼 수 있어요.";if(!S.boasted){S.boasted=1;gainXP(10);save()}}
     catch(e){$("bpost").disabled=false;$("bmsg").textContent=e&&e.code==="permission-denied"?"오늘은 이미 자랑했어요. 내일 다시 올려 주세요.":e&&e.code==="quota_exceeded"?"게시판이 가득 찼어요. 선생님께 알려 주세요.":"올리지 못했어요. 잠시 뒤 다시 해 보세요."}};
   $("bx").onclick=()=>{$("veil").hidden=true};
   onVeilClose(boastClose);boastClose();
-  try{BOAST_UNSUB.push(ACCT.db.collection("boast").orderBy("at","desc").limit(80).onSnapshot(q=>{posts=q.docs.map(d=>({id:d.id,...d.data()}));render()},()=>{$("bwall").innerHTML='<p class="fine">게시판을 불러오지 못했어요.</p>'}));
-    BOAST_UNSUB.push(ACCT.db.collection("cheers").limit(3000).onSnapshot(q=>{cheers=q.docs.map(d=>d.data());render()},()=>{}))}catch(e){}}
+  BOAST_LIVE={get posts(){return posts},set posts(v){posts=v},get cheers(){return cheers},set cheers(v){cheers=v},render:()=>render()};
+  boastFetch(false)}
+/* 게시판은 10분 동안 한 번만 불러와요 (서버 읽기 아끼기) */
+let BCACHE=null,BOAST_LIVE=null;
+async function boastFetch(force){const L=BOAST_LIVE;if(!L)return;
+  if(!force&&BCACHE&&Date.now()-BCACHE.at<600000){L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render();return}
+  try{const cut=Date.now()-BOAST_KEEP*DAYMS;const [q1,q2]=await Promise.all([ACCT.db.collection("boast").orderBy("at","desc").limit(80).get(),ACCT.db.collection("cheers").where("at",">",cut).limit(3000).get()]);
+    BCACHE={at:Date.now(),posts:q1.docs.map(d=>({id:d.id,...d.data()})),cheers:q2.docs.map(d=>d.data())};if(BOAST_LIVE!==L)return;L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render()}
+  catch(e){if(BCACHE){L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render()}else if($("bwall"))$("bwall").innerHTML='<p class="fine">게시판을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.</p>'}}
+function bcSync(){if(BCACHE&&BOAST_LIVE){BCACHE.posts=BOAST_LIVE.posts;BCACHE.cheers=BOAST_LIVE.cheers}}
 function escH(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 /* ---------- 통신: 소식 전하기 대결 + 통신 카드 ---------- */
 const COMM=[
@@ -2602,35 +2610,42 @@ function acctHome(note){
   acctShow((note?'<p class="anote">'+note+'</p>':'')+'<div class="abtns"><button id="a_new" class="big">처음 왔어요<small>새 마을 만들기</small></button><button id="a_old" class="big alt">이어 하기<small>'+(last?last.nick+"#"+last.num:"내 아이디로 들어가기")+'</small></button></div><button id="a_local" class="linkb">이 기기에서만 해 보기 (다른 기기에서는 이어 할 수 없어요)</button>');
   $("a_new").onclick=acctNewForm;$("a_old").onclick=()=>acctLoginForm(last);$("a_local").onclick=acctLocal}
 function acctLocal(){ACCT.id=null;$("acct").hidden=true;S=load()||fresh();migrate();afterLogin()}
+const TMO=(p,ms)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej({code:"slow"}),ms))]);
+function slowBox(m,retry){m.innerHTML='<b>서버가 바빠서 오래 걸리고 있어요.</b><br>인터넷이 느리거나, 오늘 이용하는 친구가 아주 많아서 그래요.<div class="abtns" style="margin-top:8px"><button id="a_retry" class="alt">다시 해 보기</button><button id="a_here">이 기기에서 먼저 시작하기</button></div><span class="fine">이 기기에서 시작하면 이 기기에만 저장돼요.</span>';
+  $("a_retry").onclick=retry;$("a_here").onclick=acctLocal}
 function acctNewForm(){
   acctShow('<h2>새 마을 만들기</h2><label>별명 <span class="fine">(진짜 이름은 쓰지 마세요)</span><input id="a_nick" maxlength="6" autocomplete="off" placeholder="예: 하늘"></label><label>비밀번호 숫자 4자리<input id="a_pin" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="예: 1234"></label><p class="fine" id="a_msg"></p><div class="abtns"><button id="a_back" class="alt">뒤로</button><button id="a_go">만들기</button></div>');
   $("a_back").onclick=()=>acctHome();$("a_nick").focus();
   $("a_go").onclick=async()=>{const nick=$("a_nick").value.trim(),pin=$("a_pin").value.trim(),m=$("a_msg");
     const bad=nickOk(nick);if(bad){m.textContent=bad;return}if(!/^\d{4}$/.test(pin)){m.textContent="비밀번호는 숫자 4자리예요.";return}
     $("a_go").disabled=true;const step=(n,t)=>{m.innerHTML='<b>'+n+'/3</b> '+t};step(1,"서버에 연결하는 중…");
-    try{const col=ACCT.db.collection("villages");const q=await col.where("nick","==",nick).get();step(2,"빈 번호 찾는 중…");let num=1;q.docs.forEach(d=>{const v=d.data();if(v&&v.num>=num)num=v.num+1});
-      let id;for(;;){id=docIdOf(nick,num);const ex=await col.doc(id).get();if(!ex.exists)break;num++}
-      step(3,"마을 저장하는 중…");S=fresh();migrate();const ref=col.doc(id);await ref.set({nick,num,pin:await pinHash(id,pin),save:JSON.stringify(S),at:Date.now(),made:Date.now()});
+    try{const col=ACCT.db.collection("villages");const q=await TMO(col.where("nick","==",nick).get(),15000);step(2,"빈 번호 찾는 중…");let num=1;q.docs.forEach(d=>{const v=d.data();if(v&&v.num>=num)num=v.num+1});
+      let id;for(;;){id=docIdOf(nick,num);const ex=await TMO(col.doc(id).get(),15000);if(!ex.exists)break;num++}
+      step(3,"마을 저장하는 중…");S=fresh();migrate();const ref=col.doc(id);await TMO(ref.set({nick,num,pin:await pinHash(id,pin),save:JSON.stringify(S),at:Date.now(),made:Date.now()}),15000);
       ACCT.ref=ref;ACCT.id=id;ACCT.nick=nick;ACCT.num=num;try{localStorage.setItem("ijang-last",JSON.stringify({nick,num}))}catch(e){}save();
       acctShow('<h2>새 마을이 생겼어요!</h2><p>내 아이디와 비밀번호를 <b>수첩에 꼭 적어 두세요.</b> 다른 기기에서도 이어 할 수 있어요.</p><div class="aid"><span>아이디</span><b>'+nick+'#'+num+'</b><span>비밀번호</span><b>'+pin+'</b></div><div class="abtns"><button id="a_ok" class="big">적었어요, 시작!</button></div>');
       $("a_ok").onclick=()=>{$("acct").hidden=true;afterLogin()}}
-    catch(e){$("a_go").disabled=false;m.textContent="만들지 못했어요. 잠시 뒤 다시 해 보세요. ("+(e&&e.code||"오류")+")"}}}
+    catch(e){$("a_go").disabled=false;if(e&&(e.code==="slow"||e.code==="resource-exhausted"||e.code==="unavailable"||e.code==="deadline-exceeded"))slowBox(m,()=>$("a_go").click());else m.textContent="만들지 못했어요. 잠시 뒤 다시 해 보세요. ("+(e&&e.code||"오류")+")"}}}
 function acctLoginForm(last){
   acctShow('<h2>이어 하기</h2><label>별명<input id="a_nick" maxlength="6" autocomplete="off" value="'+(last?last.nick:"")+'"></label><label>번호 <span class="fine">(별명 뒤 # 다음 숫자)</span><input id="a_num" inputmode="numeric" maxlength="4" autocomplete="off" value="'+(last?last.num:"")+'"></label><label>비밀번호 숫자 4자리<input id="a_pin" inputmode="numeric" maxlength="4" autocomplete="off"></label><p class="fine" id="a_msg"></p><div class="abtns"><button id="a_back" class="alt">뒤로</button><button id="a_go">들어가기</button></div>');
   $("a_back").onclick=()=>acctHome();(last?$("a_pin"):$("a_nick")).focus();
   $("a_go").onclick=async()=>{const nick=$("a_nick").value.trim(),num=parseInt($("a_num").value,10),pin=$("a_pin").value.trim(),m=$("a_msg");
     if(!nick||!num||!/^\d{4}$/.test(pin)){m.textContent="별명, 번호, 비밀번호 4자리를 모두 넣어 주세요.";return}
     $("a_go").disabled=true;m.textContent="마을을 찾는 중…";
-    try{const id=docIdOf(nick,num),ref=ACCT.db.collection("villages").doc(id),d=await ref.get();
+    try{const id=docIdOf(nick,num),ref=ACCT.db.collection("villages").doc(id),d=await TMO(ref.get(),15000);
       if(!d.exists){$("a_go").disabled=false;m.textContent="그런 아이디가 없어요. 별명과 번호를 다시 확인해 보세요.";return}
       const v=d.data();if(v.pin!==await pinHash(id,pin)){$("a_go").disabled=false;m.textContent="비밀번호가 달라요.";return}
       let o=null;try{o=JSON.parse(v.save)}catch(e){}let lc=null;try{lc=JSON.parse(localStorage.getItem("ijang-v2-"+id)||"null")}catch(e){}const newer=lc&&lc.b&&(lc.savedAt||0)>((o&&o.savedAt)||v.at||0);S=newer?lc:((o&&o.b)?o:fresh());migrate();
       ACCT.ref=ref;ACCT.id=id;ACCT.nick=v.nick;ACCT.num=v.num;try{localStorage.setItem("ijang-last",JSON.stringify({nick:v.nick,num:v.num}))}catch(e){}save();
       $("acct").hidden=true;afterLogin();toast(v.nick+"#"+v.num+" 이장님, 어서 오세요!")}
-    catch(e){$("a_go").disabled=false;m.textContent="불러오지 못했어요. 잠시 뒤 다시 해 보세요. ("+(e&&e.code||"오류")+")"}}}
-function cloudSave(now){if(!ACCT.ref)return;clearTimeout(ACCT.timer);if(!now){ACCT.timer=setTimeout(()=>cloudSave(true),5000);return}
-  if(ACCT.busy){ACCT.again=true;return}ACCT.busy=true;
-  ACCT.ref.update({save:JSON.stringify(S),at:Date.now()}).then(()=>{ACCT.lastAt=Date.now();updAcct()}).catch(e=>{if(e&&e.code==="quota_exceeded")toast("저장 공간이 가득 찼어요. 선생님께 알려 주세요.")})
+    catch(e){$("a_go").disabled=false;if(e&&(e.code==="slow"||e.code==="resource-exhausted"||e.code==="unavailable"||e.code==="deadline-exceeded"))slowBox(m,()=>$("a_go").click());else m.textContent="불러오지 못했어요. 잠시 뒤 다시 해 보세요. ("+(e&&e.code||"오류")+")"}}}
+/* 서버 저장은 3분에 한 번 (+ 다음 달·창 닫기·지금 저장) — 무료 쓰기 한도 아끼기 */
+const CLOUD_GAP=180000;
+function cloudSave(now){if(!ACCT.ref)return;
+  if(!now){if(ACCT.timer)return;const wait=Math.max(5000,CLOUD_GAP-(Date.now()-(ACCT.lastTry||0)));ACCT.timer=setTimeout(()=>{ACCT.timer=null;cloudSave(true)},wait);return}
+  clearTimeout(ACCT.timer);ACCT.timer=null;const j=JSON.stringify(S);if(j===ACCT.lastJ)return;
+  if(ACCT.busy){ACCT.again=true;return}ACCT.busy=true;ACCT.lastTry=Date.now();
+  ACCT.ref.update({save:j,at:Date.now()}).then(()=>{ACCT.lastJ=j;ACCT.lastAt=Date.now();updAcct()}).catch(e=>{if(e&&e.code==="quota_exceeded")toast("저장 공간이 가득 찼어요. 선생님께 알려 주세요.")})
     .finally(()=>{ACCT.busy=false;if(ACCT.again){ACCT.again=false;cloudSave(true)}})}
 function updAcct(){const b=$("acctbtn");if(!b)return;b.hidden=false;b.textContent=ACCT.id?ACCT.nick+"#"+ACCT.num:"기기 저장"}
 function acctInfo(){
