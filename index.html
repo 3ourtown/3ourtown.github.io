@@ -1260,7 +1260,7 @@ function walkerObjs(objs){const z=view.z;WALK.forEach(w=>{if(w.hid>0)return;cons
 function walkerAt(x,y,sc){sc=sc||1;let best=null,bd=1e9;for(const w of WALK){if(w.hid>0||!w.sxy)continue;const [wx,wy,hh]=w.sxy,d=Math.hypot(x-wx,(y-wy)*.7);if(d<Math.max(14,hh*.55)*sc&&d<bd){bd=d;best=w}}return best}
 
 
-/* ---------- 우리 학교 아이들 (이룡분교장 친구들) ---------- */
+/* ---------- 우리 학교 아이들 ---------- */
 const KIDS=[["hyeongrak","형락",28,"m","장난칠 사람 여기 붙어라!"],["heemin","희민",28,"f","리본 예쁘죠? 하늘색이에요!"],
   ["sihyeong","시형",34,"m","책 읽으러 도서관 가고 싶다…"],["sijin","시진",33,"f","조용한 공원 벤치가 제일 좋아요."],
   ["onjo","온조",31,"m","오늘은 어디 가 볼까?"],["onsun","온순",31,"f","이장님, 안녕하세요!"],
@@ -2245,7 +2245,7 @@ function boastOpen(){if(!ACCT.db){modal("마을 자랑하기",'<p>마을 자랑�
   const today=ymd(Date.now()),posted=(()=>{try{return localStorage.getItem("ijang-bday-"+me)===today}catch(e){return false}})();
   $("modal").innerHTML='<button class="mclose" id="bx" aria-label="닫기">✕ 닫기</button><h2>📸 마을 자랑하기</h2>'+
     '<div class="bnew"><img id="bshot" alt="내 마을 전체 사진"><div>'+
-    '<div class="bprof"><input id="bsch" maxlength="12" placeholder="학교 (예: 이룡분교)" value="'+escH(prof.school||"")+'"><select id="byr">'+[1,2,3,4,5,6].map(n=>'<option value="'+n+'"'+((prof.year||3)==n?" selected":"")+'>'+n+'학년</option>').join("")+'</select><input id="bnick" maxlength="8" placeholder="별명" value="'+escH(prof.nick||ACCT.nick||"")+'"></div>'+
+    '<div class="bprof"><input id="bsch" maxlength="12" placeholder="학교 (예: 최강초)" value="'+escH(prof.school||"")+'"><select id="byr">'+[1,2,3,4,5,6].map(n=>'<option value="'+n+'"'+((prof.year||3)==n?" selected":"")+'>'+n+'학년</option>').join("")+'</select><input id="bnick" maxlength="8" placeholder="별명" value="'+escH(prof.nick||ACCT.nick||"")+'"></div>'+
     '<p class="fine">자랑할 것을 골라요 (최대 3개)</p><div class="bphs" id="bphs">'+phHTML()+'</div>'+
     '<div class="row" style="justify-content:flex-start;margin-top:6px"><button id="bpost"'+(posted?" disabled":"")+'>자랑 올리기</button><button class="ghost" id="bre">다시 찍기</button></div>'+
     '<p class="fine" id="bmsg">'+(posted?"오늘은 이미 자랑했어요. 내일 또 올릴 수 있어요!":"자랑은 일주일 동안 전시돼요. 하루에 한 번 올릴 수 있어요. 실제 이름은 쓰지 말고 별명을 써요.")+'</p></div></div>'+
