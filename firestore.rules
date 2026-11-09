@@ -44,7 +44,7 @@ service cloud.firestore {
     // 자랑 큰 사진: 자랑을 눌렀을 때만 읽어요
     match /boastimg/{id} {
       allow read: if signedIn();
-      allow create: if signedIn()
+      allow create: if isAdmin() || signedIn()
         && id.matches('b-' + request.auth.uid + '-[0-9]{8}')
         && request.resource.data.keys().hasOnly(['uid','img'])
         && request.resource.data.uid == request.auth.uid
