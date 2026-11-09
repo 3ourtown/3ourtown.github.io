@@ -2237,7 +2237,7 @@ function boastOpen(){if(!ACCT.db){modal("마을 자랑하기",'<p>마을 자랑�
     else{openId=null;$("bwall").innerHTML=(old.length?'<h4 style="margin:4px 0">🏅 지난주 인기 마을</h4><div class="bgrid">'+old.map(p=>thumb(p,cnt)).join("")+'</div>':'')+'<h4 style="margin:10px 0 4px">이번 주 자랑 '+cur.length+'개 <span class="fine">· 누르면 크게 보고 응원할 수 있어요</span></h4>'+
       (cur.length?'<div class="bgrid">'+cur.map(p=>thumb(p,cnt)).join("")+'</div>':'<p class="fine" style="text-align:center;padding:20px">이번 주에 자랑한 마을이 아직 없어요. 첫 번째로 자랑해 보세요!</p>')+
       (BLIM<80&&posts.length>=BLIM?'<div class="row" style="justify-content:center;margin:10px 0"><button class="ghost" id="bmore">자랑 더 보기</button></div>':'');
-      if($("bmore"))$("bmore").onclick=()=>{BLIM=80;$("bmore").disabled=true;$("bmore").textContent="불러오는 중…";boastFetch(true)}}
+      if($("bmore"))$("bmore").onclick=()=>{BLIM=Math.min(80,BLIM+24);$("bmore").disabled=true;$("bmore").textContent="불러오는 중…";boastFetch(true)}}
     $("bwall").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{openId=b.dataset.open;sfx("click");render();$("bwall").scrollTop=0;$("bwall").scrollIntoView({block:"nearest"})});
     if($("bback"))$("bback").onclick=()=>{openId=null;render()};
     $("bwall").querySelectorAll(".bzimg").forEach(im=>im.onclick=()=>zoomView(im.src));
@@ -2276,17 +2276,20 @@ function boastOpen(){if(!ACCT.db){modal("마을 자랑하기",'<p>마을 자랑�
   BOAST_LIVE={get posts(){return posts},set posts(v){posts=v},get cheers(){return cheers},set cheers(v){cheers=v},render:()=>render()};
   boastFetch(false)}
 /* 게시판은 10분 동안 한 번만 불러와요 (서버 읽기 아끼기) */
-let BCACHE=null,BOAST_LIVE=null,BLIM=30;const BIMG={};
+let BCACHE=null,BOAST_LIVE=null,BLIM=12;const BIMG={};
 /* 큰 사진은 자랑을 눌렀을 때만 따로 불러와요 */
 function bigLoad(id){if(BIMG[id]!==undefined)return;BIMG[id]=null;ACCT.db.collection("boastimg").doc(id).get().then(d=>{const v=d&&d.exists&&d.data();BIMG[id]=(v&&v.img)||"";if(BOAST_LIVE)BOAST_LIVE.render()}).catch(()=>{BIMG[id]=undefined})}
 function thumbOf(src,w){return new Promise(res=>{const im=new Image();im.onload=()=>{const c=document.createElement("canvas"),k=Math.min(1,w/im.width);c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext("2d");x.imageSmoothingQuality="high";x.drawImage(im,0,0,c.width,c.height);
   let q=.72,u=c.toDataURL("image/jpeg",q);while(u.length>45000&&q>.35){q-=.08;u=c.toDataURL("image/jpeg",q)}res(u)};im.onerror=()=>res("");im.src=src})}
-async function boastFetch(force){const L=BOAST_LIVE;if(!L)return;
+const BCK=()=>"ijang-bcache-"+(ACCT.uid||ACCT.id||"");
+function bcSave(){try{if(!BCACHE)return;const j=JSON.stringify({...BCACHE,lim:BLIM});if(j.length<1800000)localStorage.setItem(BCK(),j);else localStorage.removeItem(BCK())}catch(e){}}
+function bcLoad(){if(BCACHE)return;try{const v=JSON.parse(localStorage.getItem(BCK())||"null");if(v&&Date.now()-v.at<600000&&Array.isArray(v.posts)){BCACHE={at:v.at,posts:v.posts,cheers:v.cheers||[]};if(v.lim>BLIM)BLIM=v.lim}}catch(e){}}
+async function boastFetch(force){const L=BOAST_LIVE;if(!L)return;if(!force)bcLoad();
   if(!force&&BCACHE&&Date.now()-BCACHE.at<600000){L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render();return}
   try{const [q1,q2]=await Promise.all([ACCT.db.collection("boast").orderBy("at","desc").limit(BLIM).get(),ACCT.db.collection("cheers").where("by","==",ACCT.uid||ACCT.id).limit(300).get()]);
-    BCACHE={at:Date.now(),posts:q1.docs.map(d=>({id:d.id,...d.data()})),cheers:q2.docs.map(d=>d.data())};if(BOAST_LIVE!==L)return;L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render()}
+    BCACHE={at:Date.now(),posts:q1.docs.map(d=>({id:d.id,...d.data()})),cheers:q2.docs.map(d=>d.data())};bcSave();if(BOAST_LIVE!==L)return;L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render()}
   catch(e){if(BCACHE){L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render()}else if($("bwall"))$("bwall").innerHTML='<p class="fine">게시판을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.</p>'}}
-function bcSync(){if(BCACHE&&BOAST_LIVE){BCACHE.posts=BOAST_LIVE.posts;BCACHE.cheers=BOAST_LIVE.cheers}}
+function bcSync(){if(BCACHE&&BOAST_LIVE){BCACHE.posts=BOAST_LIVE.posts;BCACHE.cheers=BOAST_LIVE.cheers;bcSave()}}
 function escH(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 /* ---------- 통신: 소식 전하기 대결 + 통신 카드 ---------- */
 const COMM=[
