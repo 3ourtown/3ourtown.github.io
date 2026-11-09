@@ -2639,7 +2639,7 @@ function acctNewForm(){
     try{const col=ACCT.db.collection("villages");const q=await TMO(col.where("nick","==",nick).get(),15000);step(2,"빈 번호 찾는 중…");let num=1;q.docs.forEach(d=>{const v=d.data();if(v&&v.num>=num)num=v.num+1});
       let id;for(;;){id=docIdOf(nick,num);const ex=await TMO(col.doc(id).get(),15000);if(!ex.exists)break;num++}
       step(3,"마을 저장하는 중…");S=fresh();migrate();const ref=col.doc(id);await TMO(ref.set({nick,num,pin:await pinHash(id,pin),save:JSON.stringify(S),at:Date.now(),made:Date.now()}),15000);
-      ACCT.ref=ref;ACCT.id=id;ACCT.nick=nick;ACCT.num=num;try{localStorage.setItem("ijang-last",JSON.stringify({nick,num}))}catch(e){}save();
+      ACCT.ref=ref;ACCT.id=id;ACCT.nick=nick;ACCT.num=num;try{localStorage.setItem("ijang-last",JSON.stringify({nick,num}))}catch(e){}save();ACCT.lastK=JSON.stringify({...S,savedAt:0,play:0});
       acctShow('<h2>새 마을이 생겼어요!</h2><p>내 아이디와 비밀번호를 <b>수첩에 꼭 적어 두세요.</b> 다른 기기에서도 이어 할 수 있어요.</p><div class="aid"><span>아이디</span><b>'+nick+'#'+num+'</b><span>비밀번호</span><b>'+pin+'</b></div><div class="abtns"><button id="a_ok" class="big">적었어요, 시작!</button></div>');
       $("a_ok").onclick=()=>{$("acct").hidden=true;afterLogin()}}
     catch(e){$("a_go").disabled=false;if(e&&(e.code==="slow"||e.code==="resource-exhausted"||e.code==="unavailable"||e.code==="deadline-exceeded"))slowBox(m,()=>$("a_go").click());else m.textContent="만들지 못했어요. 잠시 뒤 다시 해 보세요. ("+(e&&e.code||"오류")+")"}}}
@@ -2653,16 +2653,16 @@ function acctLoginForm(last){
       if(!d.exists){$("a_go").disabled=false;m.textContent="그런 아이디가 없어요. 별명과 번호를 다시 확인해 보세요.";return}
       const v=d.data();if(v.pin!==await pinHash(id,pin)){$("a_go").disabled=false;m.textContent="비밀번호가 달라요.";return}
       let o=null;try{o=JSON.parse(v.save)}catch(e){}let lc=null;try{lc=JSON.parse(localStorage.getItem("ijang-v2-"+id)||"null")}catch(e){}const newer=lc&&lc.b&&(lc.savedAt||0)>((o&&o.savedAt)||v.at||0);S=newer?lc:((o&&o.b)?o:fresh());migrate();
-      ACCT.ref=ref;ACCT.id=id;ACCT.nick=v.nick;ACCT.num=v.num;try{localStorage.setItem("ijang-last",JSON.stringify({nick:v.nick,num:v.num}))}catch(e){}save();
+      ACCT.ref=ref;ACCT.id=id;ACCT.nick=v.nick;ACCT.num=v.num;try{localStorage.setItem("ijang-last",JSON.stringify({nick:v.nick,num:v.num}))}catch(e){}save();if(!newer)ACCT.lastK=JSON.stringify({...S,savedAt:0,play:0});
       $("acct").hidden=true;afterLogin();toast(v.nick+"#"+v.num+" 이장님, 어서 오세요!")}
     catch(e){$("a_go").disabled=false;if(e&&(e.code==="slow"||e.code==="resource-exhausted"||e.code==="unavailable"||e.code==="deadline-exceeded"))slowBox(m,()=>$("a_go").click());else m.textContent="불러오지 못했어요. 잠시 뒤 다시 해 보세요. ("+(e&&e.code||"오류")+")"}}}
 /* 서버 저장은 3분에 한 번 (+ 다음 달·창 닫기·지금 저장) — 무료 쓰기 한도 아끼기 */
 const CLOUD_GAP=180000;
 function cloudSave(now){if(!ACCT.ref)return;
-  if(!now){if(ACCT.timer)return;const wait=Math.max(5000,CLOUD_GAP-(Date.now()-(ACCT.lastTry||0)));ACCT.timer=setTimeout(()=>{ACCT.timer=null;cloudSave(true)},wait);return}
-  clearTimeout(ACCT.timer);ACCT.timer=null;const j=JSON.stringify(S);if(j===ACCT.lastJ)return;
+  if(!now){if(ACCT.timer||document.visibilityState==="hidden")return;const wait=Math.max(5000,CLOUD_GAP-(Date.now()-(ACCT.lastTry||0)));ACCT.timer=setTimeout(()=>{ACCT.timer=null;cloudSave(true)},wait);return}
+  clearTimeout(ACCT.timer);ACCT.timer=null;const j=JSON.stringify(S),k=JSON.stringify({...S,savedAt:0,play:0});if(k===ACCT.lastK)return;
   if(ACCT.busy){ACCT.again=true;return}ACCT.busy=true;ACCT.lastTry=Date.now();
-  ACCT.ref.update({save:j,at:Date.now()}).then(()=>{ACCT.lastJ=j;ACCT.lastAt=Date.now();updAcct()}).catch(e=>{if(e&&e.code==="quota_exceeded")toast("저장 공간이 가득 찼어요. 선생님께 알려 주세요.")})
+  ACCT.ref.update({save:j,at:Date.now()}).then(()=>{ACCT.lastK=k;ACCT.lastAt=Date.now();updAcct()}).catch(e=>{if(e&&e.code==="quota_exceeded")toast("저장 공간이 가득 찼어요. 선생님께 알려 주세요.")})
     .finally(()=>{ACCT.busy=false;if(ACCT.again){ACCT.again=false;cloudSave(true)}})}
 function updAcct(){const b=$("acctbtn");if(!b)return;b.hidden=false;b.textContent=ACCT.id?ACCT.nick+"#"+ACCT.num:"기기 저장"}
 function acctInfo(){
