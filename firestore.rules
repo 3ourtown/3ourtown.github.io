@@ -16,10 +16,12 @@ service cloud.firestore {
     match /boast/{id} {
       allow read: if signedIn();
       allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['uid','img','texts','school','year','nick','vgrade','pop','at','expireAt','hidden'])
+        && request.resource.data.keys().hasOnly(['uid','img','thumb','c0','c1','c2','texts','school','year','nick','vgrade','pop','at','expireAt','hidden'])
         && request.resource.data.uid == request.auth.uid
         && id.matches('b-' + request.auth.uid + '-[0-9]{8}')
-        && request.resource.data.img is string && request.resource.data.img.size() < 300000
+        && (!('img' in request.resource.data) || (request.resource.data.img is string && request.resource.data.img.size() < 300000))
+        && (!('thumb' in request.resource.data) || (request.resource.data.thumb is string && request.resource.data.thumb.size() < 60000))
+        && request.resource.data.get('c0', 0) == 0 && request.resource.data.get('c1', 0) == 0 && request.resource.data.get('c2', 0) == 0
         && request.resource.data.texts is list && request.resource.data.texts.size() >= 1 && request.resource.data.texts.size() <= 3
         && request.resource.data.texts.hasOnly(['intro','pop50','pop100','happy','grade','museum','folk','myeong','trans','bong','fest','dino','forest','hall','gold','grad'])
         && request.resource.data.school is string && request.resource.data.school.size() <= 12
@@ -28,7 +30,25 @@ service cloud.firestore {
         && request.resource.data.hidden == false
         && request.resource.data.at is int && request.resource.data.at > nowMs() - 600000 && request.resource.data.at < nowMs() + 600000
         && request.resource.data.expireAt is timestamp;
-      allow update: if isAdmin();
+      // 응원 수: 내 응원 기록을 만들거나 지우면서 숫자를 1씩만 바꿀 수 있어요
+      allow update: if isAdmin() || (signedIn() && (cheerOk(id, 'c0', '0') || cheerOk(id, 'c1', '1') || cheerOk(id, 'c2', '2')));
+      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+    function cheerPath(post, k) { return /databases/$(database)/documents/cheers/$(post + '_' + request.auth.uid + '_' + k); }
+    function cheerOk(post, f, k) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([f])
+        && ((request.resource.data[f] == resource.data.get(f, 0) + 1 && existsAfter(cheerPath(post, k)) && !exists(cheerPath(post, k)))
+         || (request.resource.data[f] == resource.data.get(f, 0) - 1 && !existsAfter(cheerPath(post, k)) && exists(cheerPath(post, k))));
+    }
+
+    // 자랑 큰 사진: 자랑을 눌렀을 때만 읽어요
+    match /boastimg/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && id.matches('b-' + request.auth.uid + '-[0-9]{8}')
+        && request.resource.data.keys().hasOnly(['uid','img'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.img is string && request.resource.data.img.size() < 300000;
       allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
     }
 
@@ -38,6 +58,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['post','kind','by','at','expireAt'])
         && request.resource.data.by == request.auth.uid
+        && id == request.resource.data.post + '_' + request.auth.uid + '_' + string(request.resource.data.kind)
         && request.resource.data.kind is int && request.resource.data.kind >= 0 && request.resource.data.kind <= 2;
       allow delete: if isAdmin() || (signedIn() && resource.data.by == request.auth.uid);
     }

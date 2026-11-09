@@ -71,16 +71,16 @@ async function stats(){const now=Date.now(),days=[...Array(7)].map((_,i)=>dkey(n
 async function show(){$("list").innerHTML='<p class="fine">불러오는 중…</p>';
   try{if(tab==="stat"){await stats();return}if(tab==="boast"){const q=await db.collection("boast").orderBy("at","desc").limit(200).get();const now=Date.now();
       $("info").textContent="자랑 "+q.size+"개 (7일이 지나면 게임에서 안 보이고, 14일이 지나면 지워져요)";
-      $("list").innerHTML='<div class="grid">'+q.docs.map(d=>{const p=d.data(),age=Math.floor((now-p.at)/DAY);return '<div class="post'+(p.hidden?" hid":"")+'"><img src="'+p.img+'" alt=""><div class="m"><b>'+esc(p.school)+' '+esc(p.year)+'학년 · '+esc(p.nick)+'</b><span>'+(p.texts||[]).map(t=>PH[t]||t).join(" · ")+'</span><span class="fine">'+age+'일 전'+(p.hidden?" · 숨김":"")+'</span></div><div class="row"><button class="ghost" data-h="'+d.id+'" data-v="'+(p.hidden?0:1)+'">'+(p.hidden?"다시 보이기":"숨기기")+'</button><button class="warn" data-d="'+d.id+'">지우기</button></div></div>'}).join("")+'</div>';
+      $("list").innerHTML='<div class="grid">'+q.docs.map(d=>{const p=d.data(),age=Math.floor((now-p.at)/DAY);return '<div class="post'+(p.hidden?" hid":"")+'"><img src="'+(p.thumb||p.img||"")+'" alt=""><div class="m"><b>'+esc(p.school)+' '+esc(p.year)+'학년 · '+esc(p.nick)+'</b><span>'+(p.texts||[]).map(t=>PH[t]||t).join(" · ")+'</span><span class="fine">'+age+'일 전'+(p.hidden?" · 숨김":"")+'</span></div><div class="row"><button class="ghost" data-h="'+d.id+'" data-v="'+(p.hidden?0:1)+'">'+(p.hidden?"다시 보이기":"숨기기")+'</button><button class="warn" data-d="'+d.id+'">지우기</button></div></div>'}).join("")+'</div>';
       $("list").querySelectorAll("[data-h]").forEach(b=>b.onclick=async()=>{await db.collection("boast").doc(b.dataset.h).update({hidden:b.dataset.v==="1"});show()});
-      $("list").querySelectorAll("[data-d]").forEach(b=>b.onclick=async()=>{if(!confirm("이 자랑을 지울까요?"))return;await db.collection("boast").doc(b.dataset.d).delete();show()})}
+      $("list").querySelectorAll("[data-d]").forEach(b=>b.onclick=async()=>{if(!confirm("이 자랑을 지울까요?"))return;await db.collection("boast").doc(b.dataset.d).delete();db.collection("boastimg").doc(b.dataset.d).delete().catch(()=>{});show()})}
     else{const q=await db.collection("feedback").limit(300).get();$("info").textContent="받은 이야기 "+q.size+"개";
       const rows=q.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.at||0)-(a.at||0));
       $("list").innerHTML='<div class="card">'+(rows.map(r=>'<div class="fb"><b>'+(r.cat?'['+esc(r.cat)+'] ':'')+esc(r.who||"이장님")+'</b> <span class="fine">'+esc(r.month||'')+' · Lv '+esc(r.lv||'')+'</span> <span class="fine">'+(r.at?new Date(r.at).toLocaleString("ko-KR"):"")+'</span><div>'+esc(r.text||r.msg||JSON.stringify(r))+'</div><button class="warn" data-d="'+r.id+'" style="margin-top:4px;padding:4px 10px">지우기</button></div>').join("")||'<p class="fine">아직 없어요.</p>')+'</div>';
       $("list").querySelectorAll("[data-d]").forEach(b=>b.onclick=async()=>{await db.collection("feedback").doc(b.dataset.d).delete();show()})}}
   catch(e){$("list").innerHTML='<p class="fine">불러오지 못했어요. 관리자로 정한 Google 계정인지 확인해 주세요. ('+esc(e.code||e.message)+')</p>'}}
 $("clean").onclick=async()=>{if(!confirm("14일이 지난 자랑과 응원을 지울까요?"))return;const cut=Date.now()-14*DAY;let n=0;
-  for(const c of ["boast","cheers"]){const q=await db.collection(c).where("at","<",cut).limit(400).get();for(const d of q.docs){await d.ref.delete();n++}}alert(n+"개를 지웠어요");show()};
+  for(const c of ["boast","cheers"]){const q=await db.collection(c).where("at","<",cut).limit(400).get();for(const d of q.docs){await d.ref.delete();if(c==="boast")db.collection("boastimg").doc(d.id).delete().catch(()=>{});n++}}alert(n+"개를 지웠어요");show()};
 })();
 </script>
 </body>
