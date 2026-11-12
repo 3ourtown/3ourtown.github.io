@@ -855,7 +855,17 @@ function moneyTipTick(){if(!S||S.moneyTip||(S.tut||0)<3||(S.seasonsTotal||0)<1||
     '<div class="pact"><h4>주민이 늘면 한 달에 들어오는 돈</h4>'+ex.map(([n,m])=>'<div class="fbar"><div><span>주민 '+n+'명</span><b>약 '+m+'원</b></div><span class="tr"><i style="width:'+Math.round(m/125*100)+'%"></i></span></div>').join("")+'<p class="fine">행복이 60쯤일 때 예시예요. 행복이 높으면 더 많이 들어와요.</p></div>'+
     '<p>처음에는 돈이 조금씩 들어오지만, 주민이 늘면 금방 넉넉해져요. <b>참을성 있게 마을을 키워 보세요!</b></p><p class="fine">지금 우리 마을: 주민 '+pop()+'명 · 행복 '+Math.round(S.happy)+' · 다음 달 살림 돈 약 '+(Math.round(pop()*2*S.happy/100)+5)+'원</p>',[{t:"알겠어요!"}])}
 function itemInfo(){modal("모은 재료",'<div class="pact">'+["seed","lantern","fossil","slide"].map(k=>'<div class="pc" style="flex-direction:row;align-items:center;gap:10px">'+ic(k,34)+'<span style="display:flex;flex-direction:column"><b>'+ITEMS[k].nm+' '+(S.items[k]||0)+'개</b><span>'+ITEMS[k].use+'</span></span></div>').join("")+'</div><p class="fine">재료는 이달의 행사에서 모아요.</p>',[{t:"이달의 행사",ghost:true,f:()=>setTimeout(()=>{eventOpen();update()},50)},{t:"닫기"}])}
-const NOTICES=[{id:"money2",daily:true,until:"20261111",when:()=>true,t:"📢 운영자 알림 · 돈은 이렇게 모아요",
+const NOTICES=[{id:"feat1112",daily:true,until:"20261113",when:()=>true,t:"📢 운영자 알림 · 이렇게 멋진 마을이 있어요!",
+  b:'<p><b>시흥은행초 · 잘생김</b> 이장님이 만든 마을이에요. 정말 멋지죠?</p>'+
+    '<div id="featpic" style="min-height:120px;border-radius:12px;background:#d8e6ee;display:flex;align-items:center;justify-content:center;color:#5d7350;font-size:13px;overflow:hidden">마을 사진을 불러오는 중…</div>'+
+    '<p style="margin-top:10px">🏆 주민이 무려 <b>1,250명</b>이나 사는 마을이에요! <b>최고의 마을</b> 칭호를 받고, 졸업 앨범을 모두 채워 <b>졸업장</b>까지 받았어요.</p>'+
+    '<p>여러분도 마을을 멋지게 키워서 <b>📸 자랑</b>에 올려 보세요. 다음에는 여러분 마을이 소개될지도 몰라요!</p>',
+  onshow:()=>{const box=$("featpic");if(!box)return;const id="b-A3Pp8tgHYUfKVJU1wtL0vZMJ0MG3-20261111";
+    const show=src=>{if(!src){box.textContent="사진은 📸 자랑 게시판에서 볼 수 있어요.";return}box.innerHTML='<img src="'+src+'" alt="시흥은행초 잘생김의 마을" style="width:100%;display:block;cursor:zoom-in" title="눌러서 크게 보기">';box.querySelector("img").onclick=()=>zoomView(src)};
+    if(BIMG[id])return show(BIMG[id]);if(!ACCT.db)return show("");
+    TMO(ACCT.db.collection("boastimg").doc(id).get(),10000).then(d=>{const v=d&&d.exists&&d.data();if(v&&v.img)BIMG[id]=v.img;show(v&&v.img)}).catch(()=>show(""))},
+  go:{t:"📸 자랑 게시판 구경하기",f:()=>setTimeout(()=>boastOpen(),50)}},
+  {id:"money2",daily:true,until:"20261111",when:()=>true,t:"📢 운영자 알림 · 돈은 이렇게 모아요",
   b:'<p><b>처음에는 돈이 천천히 모여요.</b> 주민이 적을 때는 한 달에 10~20원 정도밖에 안 들어와요. 고장 난 게 아니니 걱정하지 마세요!</p><ul>'+
     '<li>🏠 <b>집을 지어 주민을 늘려요.</b> 다음 달로 넘어갈 때 주민들이 세금을 내요. 주민이 많을수록 돈이 많이 들어와요.</li>'+
     '<li>😊 <b>주민을 행복하게 해요.</b> 행복이 높으면 세금이 더 많이 들어와요. 공원과 놀이터를 지어 보세요.</li>'+
@@ -869,7 +879,7 @@ const NOTICES=[{id:"money2",daily:true,until:"20261111",when:()=>true,t:"📢 �
   go:{t:"📸 자랑 게시판 가기",f:()=>setTimeout(()=>boastOpen(),50)}}];
 function noticeTick(){if(!S||(S.tut||0)<3||!$("veil").hidden||!$("elder").hidden)return;if(!S.moneyTip)return;S.seenN=S.seenN||[];
   const day=ymd(Date.now()),key=x=>x.daily?x.id+"@"+day:x.id;
-  const n=NOTICES.find(x=>!(x.until&&day>x.until)&&!S.seenN.includes(key(x))&&x.when());if(!n)return;S.seenN=S.seenN.filter(k=>!/@/.test(k)||k.endsWith("@"+day)).concat(key(n));save();modal(n.t,n.b,n.go?[{t:"나중에",ghost:true},n.go]:[{t:"알겠어요!"}])}
+  const n=NOTICES.find(x=>!(x.until&&day>x.until)&&!S.seenN.includes(key(x))&&x.when());if(!n)return;S.seenN=S.seenN.filter(k=>!/@/.test(k)||k.endsWith("@"+day)).concat(key(n));save();modal(n.t,n.b,n.go?[{t:"닫기",ghost:true},n.go]:[{t:"알겠어요!"}]);if(n.onshow)try{n.onshow()}catch(e){}}
 function pubTick(){if(!S||!S.unlocked||!S.pubSeq||!$("veil").hidden||!$("elder").hidden)return;const nx=pubNext(),k=nx||"done";if(S.pubTold===k)return;
   if(!S.pubTold){S.pubTold="police";return}S.pubTold=k;save();const NM={fire:"소방서",hospital:"병원",school:"학교"};
   if(nx)say("좋아! 이제 "+NM[nx]+"도 지을 수 있다네. "+(nx==="fire"?"불이 나면 달려와 줄 소방서를 지어 보게.":nx==="hospital"?"아픈 주민이 치료받을 병원을 지어 보게.":"아이들이 배우고 친구를 만날 학교를 지어 보게."),()=>pulse(nx));
