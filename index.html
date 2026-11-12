@@ -878,7 +878,7 @@ const NOTICES=[{id:"feat1112",daily:true,until:"20261113",when:()=>true,t:"📢 
   {id:"boast1",daily:true,until:"20261106",when:()=>{if(!(typeof ACCT!=="undefined"&&ACCT.db))return false;try{return localStorage.getItem("ijang-bday-"+(ACCT.uid||ACCT.id))!==ymd(Date.now())}catch(e){return true}},t:"📢 운영자 알림 · 마을 자랑 게시판",
   b:'<p>위쪽 <b>📸 자랑</b> 버튼을 누르면 <b>다른 학교 친구들의 마을</b>을 구경할 수 있어요.</p><ul><li>친구 마을 사진을 눌러 크게 보고, 👍 좋아요 · 👏 멋져요 · 😍 부러워요로 응원해 보세요.</li><li><b>우리 마을 사진도 올려 자랑</b>해 보세요. 하루에 한 번 올릴 수 있고, 일주일 동안 전시돼요.</li><li>학교·학년·별명만 보여요. 진짜 이름은 쓰지 않아요.</li></ul><p class="fine">응원을 많이 받은 마을은 "지난주 인기 마을"로 한 번 더 소개돼요.</p>',
   go:{t:"📸 자랑 게시판 가기",f:()=>setTimeout(()=>boastOpen(),50)}}];
-function noticeTick(){if(!S||(S.tut||0)<3||!$("veil").hidden||!$("elder").hidden)return;if(!S.moneyTip)return;S.seenN=S.seenN||[];
+function noticeTick(){if(!S||(S.tut||0)<3||!$("veil").hidden||!$("elder").hidden)return;S.seenN=S.seenN||[];
   const day=ymd(Date.now()),key=x=>x.daily?x.id+"@"+day:x.id;
   const n=NOTICES.find(x=>!(x.until&&day>x.until)&&!S.seenN.includes(key(x))&&x.when());if(!n)return;S.seenN=S.seenN.filter(k=>!/@/.test(k)||k.endsWith("@"+day)).concat(key(n));save();modal(n.t,n.b,n.go?[{t:"닫기",ghost:true},n.go]:[{t:"알겠어요!"}]);if(n.onshow)try{n.onshow()}catch(e){}}
 function pubTick(){if(!S||!S.unlocked||!S.pubSeq||!$("veil").hidden||!$("elder").hidden)return;const nx=pubNext(),k=nx||"done";if(S.pubTold===k)return;
@@ -2006,7 +2006,8 @@ function markKnown(t){if(!S.knownB||!t)return;if(t==="folk"){coachHide();return}
 function newbList(){if(!S||!S.knownB)return [];return availBuilds().filter(t=>!S.knownB.includes(t))}
 let COACH=null;
 function coachHide(){COACH=null;const c=$("coach");if(c)c.hidden=true}
-function coachTick(){if(typeof u3Check==="function")u3Check();if(typeof dinoHint==="function")dinoHint();if(typeof hallHint==="function")hallHint();if(typeof pubTick==="function")pubTick();if(typeof dripTick==="function")dripTick();if(typeof gradeHint==="function")gradeHint();if(typeof moneyTipTick==="function")moneyTipTick();if(typeof noticeTick==="function")noticeTick();if(typeof pierTick==="function")pierTick();if(typeof gradCheck==="function")gradCheck();if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
+function coachTick(){const L=[typeof u3Check==="function"&&u3Check,typeof dinoHint==="function"&&dinoHint,typeof hallHint==="function"&&hallHint,typeof pubTick==="function"&&pubTick,typeof dripTick==="function"&&dripTick,typeof gradeHint==="function"&&gradeHint,typeof moneyTipTick==="function"&&moneyTipTick,typeof noticeTick==="function"&&noticeTick,typeof pierTick==="function"&&pierTick,typeof gradCheck==="function"&&gradCheck];
+  for(const fn of L){if(!fn)continue;try{fn()}catch(e){if(!coachTick.err)console.warn("tick",fn.name,e);coachTick.err=1}}if($("veil").hidden&&$("elder").hidden&&typeof covTip==="function")covTip();const el=$("coach");if(!el)return;if(!S||S.tut<3||!$("veil").hidden||!$("elder").hidden||ghost||tool){el.hidden=true;return}
   const nb=newbList();if(!nb.length){el.hidden=true;return}const here=t=>!!document.querySelector('#tray .card[data-t="'+t+'"]');const t=nb.find(here)||nb[0];
   let target=null,txt="";
   if(here(t)){target=document.querySelector('#tray .card[data-t="'+t+'"]');txt="새로 지을 수 있어요: "+DEFS[t].nm+"! 여기를 눌러 보세요 👇"}
