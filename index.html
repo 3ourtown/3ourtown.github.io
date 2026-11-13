@@ -864,8 +864,7 @@ const NOTICES=[{id:"feat1112b",daily:true,until:"20261113",when:()=>true,t:"📢
     const show=src=>{if(!src){box.textContent="사진은 📸 자랑 게시판에서 볼 수 있어요.";return}box.innerHTML='<img src="'+src+'" alt="시흥은행초 잘생김의 마을" style="width:150%;max-width:none;margin-left:-25%;display:block;cursor:zoom-in" title="눌러서 크게 보기">';box.querySelector("img").onclick=()=>zoomView(src)};
     if(BIMG[id])return show(BIMG[id]);let tries=0;
     const go=()=>{if(!ACCT.db||!ACCT.db.collection){if(++tries<20)return setTimeout(go,500);return show("")}
-      TMO(ACCT.db.collection("boastimg").doc(id).get(),10000).then(d=>{const v=d&&d.exists&&d.data();if(v&&v.img)BIMG[id]=v.img;show(v&&v.img)}).catch(()=>show(""))};go()},
-  go:{t:"📸 자랑 게시판 구경하기",f:()=>setTimeout(()=>boastOpen(),50)}},
+      TMO(ACCT.db.collection("boastimg").doc(id).get(),10000).then(d=>{const v=d&&d.exists&&d.data();if(v&&v.img)BIMG[id]=v.img;show(v&&v.img)}).catch(()=>show(""))};go()}},
   {id:"money2",daily:true,until:"20261111",when:()=>true,t:"📢 운영자 알림 · 돈은 이렇게 모아요",
   b:'<p><b>처음에는 돈이 천천히 모여요.</b> 주민이 적을 때는 한 달에 10~20원 정도밖에 안 들어와요. 고장 난 게 아니니 걱정하지 마세요!</p><ul>'+
     '<li>🏠 <b>집을 지어 주민을 늘려요.</b> 다음 달로 넘어갈 때 주민들이 세금을 내요. 주민이 많을수록 돈이 많이 들어와요.</li>'+
@@ -2305,9 +2304,9 @@ function thumbOf(src,w){return new Promise(res=>{const im=new Image();im.onload=
   let q=.72,u=c.toDataURL("image/jpeg",q);while(u.length>45000&&q>.35){q-=.08;u=c.toDataURL("image/jpeg",q)}res(u)};im.onerror=()=>res("");im.src=src})}
 const BCK=()=>"ijang-bcache-"+(ACCT.uid||ACCT.id||"");
 function bcSave(){try{if(!BCACHE)return;const j=JSON.stringify({...BCACHE,lim:BLIM});if(j.length<1800000)localStorage.setItem(BCK(),j);else localStorage.removeItem(BCK())}catch(e){}}
-function bcLoad(){if(BCACHE)return;try{const v=JSON.parse(localStorage.getItem(BCK())||"null");if(v&&Date.now()-v.at<600000&&Array.isArray(v.posts)){BCACHE={at:v.at,posts:v.posts,cheers:v.cheers||[]};if(v.lim>BLIM)BLIM=v.lim}}catch(e){}}
+function bcLoad(){if(BCACHE)return;try{const v=JSON.parse(localStorage.getItem(BCK())||"null");if(v&&Date.now()-v.at<1800000&&Array.isArray(v.posts)){BCACHE={at:v.at,posts:v.posts,cheers:v.cheers||[]};if(v.lim>BLIM)BLIM=v.lim}}catch(e){}}
 async function boastFetch(force){const L=BOAST_LIVE;if(!L)return;if(!force)bcLoad();
-  if(!force&&BCACHE&&Date.now()-BCACHE.at<600000){L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render();return}
+  if(!force&&BCACHE&&Date.now()-BCACHE.at<1800000){L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render();return}
   try{const [q1,q2]=await Promise.all([ACCT.db.collection("boast").orderBy("at","desc").limit(BLIM).get(),ACCT.db.collection("cheers").where("by","==",ACCT.uid||ACCT.id).limit(300).get()]);
     BCACHE={at:Date.now(),posts:q1.docs.map(d=>({id:d.id,...d.data()})),cheers:q2.docs.map(d=>d.data())};bcSave();if(BOAST_LIVE!==L)return;L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render()}
   catch(e){if(BCACHE){L.posts=BCACHE.posts;L.cheers=BCACHE.cheers;L.render()}else if($("bwall"))$("bwall").innerHTML='<p class="fine">게시판을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.</p>'}}
