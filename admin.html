@@ -28,6 +28,7 @@ button.warn{background:#fff;color:var(--alert);border-color:var(--alert)}
 .hid{opacity:.45}
 .fine{color:var(--muted);font-size:13px}
 .fb{border-bottom:1px dashed var(--line);padding:8px 0;font-size:14px}
+.quota h3{margin:0 0 8px;font-size:17px}.qrow{display:grid;grid-template-columns:70px 1fr 150px;gap:10px;align-items:center;margin:6px 0;font-size:14px}.qbar{height:14px;background:#e9e1cf;border-radius:8px;overflow:hidden}.qbar i{display:block;height:100%;border-radius:8px;background:var(--pine)}.qbar i.y{background:#e0a92c}.qbar i.r{background:var(--alert)}.qtop{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.qbtns{display:flex;gap:6px;flex-wrap:wrap}.qbtns a{text-decoration:none}
 </style>
 </head>
 <body>
@@ -38,6 +39,7 @@ button.warn{background:#fff;color:var(--alert);border-color:var(--alert)}
   <button id="go">Google 계정으로 들어가기</button> <span class="fine" id="lmsg"></span>
 </div>
 <div id="app" hidden>
+  <div class="card quota"><div class="qtop"><h3 id="qtitle">📊 오늘 Firebase 한도</h3><div class="qbtns"><button class="ghost" id="qload">한도 불러오기</button><a href="https://console.firebase.google.com/project/ourtown-6c162/firestore/databases/-default-/usage" target="_blank" rel="noopener"><button class="ghost">Firebase 사용량 화면 열기 ↗</button></a></div></div><div id="qbody"><p class="fine">[한도 불러오기]를 누르면 오늘 읽기·쓰기가 얼마나 쓰였는지 보여요. 처음 한 번은 Google에서 "사용량 보기" 허락을 물어봐요.</p></div></div>
   <div class="tabs"><button data-t="boast" class="on">자랑 게시판</button><button data-t="fb" class="ghost">선생님께 말하기</button><button data-t="stat" class="ghost">통계</button><button class="ghost" id="clean">오래된 자랑 청소</button><button class="ghost" id="out">나가기</button></div>
   <p class="fine" id="info"></p>
   <div id="list"></div>
@@ -54,7 +56,7 @@ if(!window.FIREBASE_CONFIG){$("lmsg").textContent="firebase-config.js 에 설정
 let db,tab="boast";
 load(B+"firebase-app-compat.js").then(()=>Promise.all([load(B+"firebase-auth-compat.js"),load(B+"firebase-firestore-compat.js")])).then(()=>{
   firebase.initializeApp(window.FIREBASE_CONFIG);db=firebase.firestore();
-  firebase.auth().onAuthStateChanged(u=>{if(u&&!u.isAnonymous){$("login").hidden=true;$("app").hidden=false;show()}else{$("login").hidden=false;$("app").hidden=true}});
+  firebase.auth().onAuthStateChanged(u=>{if(u&&!u.isAnonymous){$("login").hidden=true;$("app").hidden=false;show();qLoad(false)}else{$("login").hidden=false;$("app").hidden=true}});
 });
 $("go").onclick=async()=>{$("lmsg").textContent="확인 중…";try{await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());$("lmsg").textContent=""}catch(e){$("lmsg").textContent="들어가지 못했어요: "+(e.code||e.message)}};
 $("out").onclick=()=>firebase.auth().signOut();
@@ -79,6 +81,38 @@ async function show(){$("list").innerHTML='<p class="fine">불러오는 중…</
       $("list").innerHTML='<div class="card">'+(rows.map(r=>'<div class="fb"><b>'+(r.cat?'['+esc(r.cat)+'] ':'')+esc(r.who||"이장님")+'</b> <span class="fine">'+esc(r.month||'')+' · Lv '+esc(r.lv||'')+'</span> <span class="fine">'+(r.at?new Date(r.at).toLocaleString("ko-KR"):"")+'</span><div>'+esc(r.text||r.msg||JSON.stringify(r))+'</div><button class="warn" data-d="'+r.id+'" style="margin-top:4px;padding:4px 10px">지우기</button></div>').join("")||'<p class="fine">아직 없어요.</p>')+'</div>';
       $("list").querySelectorAll("[data-d]").forEach(b=>b.onclick=async()=>{await db.collection("feedback").doc(b.dataset.d).delete();show()})}}
   catch(e){$("list").innerHTML='<p class="fine">불러오지 못했어요. 관리자로 정한 Google 계정인지 확인해 주세요. ('+esc(e.code||e.message)+')</p>'}}
+/* ---------- 오늘 한도 (구글 모니터링에서 읽기 · Firestore 한도는 쓰지 않아요) ---------- */
+const PROJ="ourtown-6c162",QSCOPE="https://www.googleapis.com/auth/monitoring.read",QLIM={read:50000,write:20000,"delete":20000};
+const QK="ijang-adm-qtok";let qTimer=null;
+function qTok(){try{const v=JSON.parse(sessionStorage.getItem(QK)||"null");return v&&v.exp>Date.now()?v.t:null}catch(e){return null}}
+async function qAuth(){const pv=new firebase.auth.GoogleAuthProvider();pv.addScope(QSCOPE);const u=firebase.auth().currentUser;
+  const r=u?await u.reauthenticateWithPopup(pv):await firebase.auth().signInWithPopup(pv);const t=r&&r.credential&&r.credential.accessToken;if(!t)throw new Error("허락을 받지 못했어요");
+  try{sessionStorage.setItem(QK,JSON.stringify({t,exp:Date.now()+50*60000}))}catch(e){}return t}
+function qStart(){const now=new Date(),f=new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"});
+  const P={};f.formatToParts(now).forEach(x=>P[x.type]=x.value);const asUtc=Date.UTC(+P.year,+P.month-1,+P.day,+P.hour,+P.minute,+P.second),off=asUtc-Math.floor(now.getTime()/1000)*1000;
+  return Date.UTC(+P.year,+P.month-1,+P.day,0,0,0)-off}
+async function qSum(tok,kind,start,end){let sum=0,page="";
+  do{const u="https://monitoring.googleapis.com/v3/projects/"+PROJ+"/timeSeries?filter="+encodeURIComponent('metric.type="firestore.googleapis.com/document/'+kind+'_count"')+
+      "&interval.startTime="+new Date(start).toISOString()+"&interval.endTime="+new Date(end).toISOString()+"&aggregation.alignmentPeriod=60s&aggregation.perSeriesAligner=ALIGN_SUM&aggregation.crossSeriesReducer=REDUCE_SUM"+(page?"&pageToken="+encodeURIComponent(page):"");
+    const r=await fetch(u,{headers:{Authorization:"Bearer "+tok}});const j=await r.json().catch(()=>({}));
+    if(!r.ok){const e=new Error((j.error&&j.error.message)||("HTTP "+r.status));e.status=r.status;throw e}
+    (j.timeSeries||[]).forEach(ts=>(ts.points||[]).forEach(p=>{sum+=+(p.value.int64Value||p.value.doubleValue||0)}));page=j.nextPageToken||""}while(page);return Math.round(sum)}
+const qFmt=n=>n>=10000?(n/10000).toFixed(1).replace(/\.0$/,"")+"만":n>=1000?(n/1000).toFixed(1).replace(/\.0$/,"")+"천":String(n);
+async function qLoad(ask){const box=$("qbody");let tok=qTok();
+  if(!tok){if(!ask){box.innerHTML='<p class="fine">[한도 불러오기]를 누르면 오늘 읽기·쓰기가 얼마나 쓰였는지 보여요. 처음 한 번은 Google에서 "사용량 보기" 허락을 물어봐요.</p>';return}
+    box.innerHTML='<p class="fine">Google 허락 창을 확인해 주세요…</p>';try{tok=await qAuth()}catch(e){box.innerHTML='<p class="fine">허락을 받지 못했어요. 다시 눌러 주세요. ('+esc(e.code||e.message)+')</p>';return}}
+  box.innerHTML='<p class="fine">불러오는 중…</p>';const start=qStart(),end=Date.now();
+  try{const [rd,wr,dl]=await Promise.all(["read","write","delete"].map(k=>qSum(tok,k,start,end)));
+    const rows=[["📖 읽기",rd,QLIM.read],["✏️ 쓰기",wr,QLIM.write],["🗑 삭제",dl,QLIM["delete"]]];
+    const worst=Math.max(...rows.map(r=>r[1]/r[2])),lamp=worst>=.9?"🔴 거의 다 찼어요":worst>=.7?"🟡 조심해요":"🟢 여유 있어요";
+    const nx=new Date(start+DAY),hh=nx.getHours();
+    box.innerHTML=rows.map(([nm,v,m])=>{const pc=Math.min(100,Math.round(v/m*100));return '<div class="qrow"><b>'+nm+'</b><div class="qbar"><i class="'+(pc>=90?"r":pc>=70?"y":"")+'" style="width:'+Math.max(1,pc)+'%"></i></div><span>'+qFmt(v)+' / '+qFmt(m)+' ('+pc+'%)</span></div>'}).join("")+
+      '<p style="margin:8px 0 0"><b>'+lamp+'</b> <span class="fine">· 오늘 '+(hh>12?"오후 "+(hh-12):"오전 "+hh)+'시에 다시 0부터 세요 · '+new Date(end).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})+' 기준 · 5분마다 새로 불러와요</span></p>'+
+      '<p class="fine" style="margin:4px 0 0">구글 모니터링 숫자라 몇 분 늦게 반영될 수 있어요. 이 숫자를 보는 건 Firebase 한도를 쓰지 않아요.</p>';
+    clearTimeout(qTimer);qTimer=setTimeout(()=>qLoad(false),5*60000)}
+  catch(e){if(e.status===401){try{sessionStorage.removeItem(QK)}catch(x){}box.innerHTML='<p class="fine">허락 시간이 지났어요. [한도 불러오기]를 다시 눌러 주세요.</p>';return}
+    box.innerHTML='<p class="fine">한도를 불러오지 못했어요: '+esc(e.message)+(e.status===403?'<br>구글 클라우드에서 "Cloud Monitoring API"를 켜야 할 수 있어요. Claude에게 알려 주세요.':'')+'</p>'}}
+$("qload").onclick=()=>qLoad(true);
 $("clean").onclick=async()=>{if(!confirm("14일이 지난 자랑과 응원을 지울까요?"))return;const cut=Date.now()-14*DAY;let n=0;
   for(const c of ["boast","cheers"]){const q=await db.collection(c).where("at","<",cut).limit(400).get();for(const d of q.docs){await d.ref.delete();if(c==="boast")db.collection("boastimg").doc(d.id).delete().catch(()=>{});n++}}alert(n+"개를 지웠어요");show()};
 })();
