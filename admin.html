@@ -61,19 +61,29 @@ load(B+"firebase-app-compat.js").then(()=>Promise.all([load(B+"firebase-auth-com
 $("go").onclick=async()=>{$("lmsg").textContent="확인 중…";try{await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());$("lmsg").textContent=""}catch(e){$("lmsg").textContent="들어가지 못했어요: "+(e.code||e.message)}};
 $("out").onclick=()=>firebase.auth().signOut();
 document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll("[data-t]").forEach(x=>{x.className=x===b?"on":"ghost"});show()});
-const cnt=async q=>{try{if(q.count){const s=await q.count().get();return s.data().count}}catch(e){}const s=await q.get();return s.size};
+const cnt=async q=>{try{const s=await q.count().get();return s.data().count}catch(e){return "?"}};
+const BSK="ijang-adm-bseen";let bmode="new",blim=30;const bSeen=()=>{try{return +localStorage.getItem(BSK)||0}catch(e){return 0}};
 const dkey=t=>{const d=new Date(t);return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")};
 async function stats(){const now=Date.now(),days=[...Array(7)].map((_,i)=>dkey(now-(6-i)*DAY));
-  const q=await db.collection("plays").where("d",">=",days[0]).get();const per={};const uniq=new Set();q.docs.forEach(d=>{const v=d.data();per[v.d]=(per[v.d]||0)+1;uniq.add(v.uid)});
+  const per=await Promise.all(days.map(d=>cnt(db.collection("plays").where("d","==",d))));const sum=per.reduce((a,b)=>a+(b||0),0);
   const [villages,devices,boast]=await Promise.all([cnt(db.collection("villages")),cnt(db.collection("devices")),cnt(db.collection("boast"))]);
-  const max=Math.max(1,...days.map(d=>per[d]||0));
-  $("info").textContent="숫자는 기기(브라우저) 기준이에요. 같은 아이가 다른 기기에서 하면 따로 세져요.";
-  $("list").innerHTML='<div class="stats"><div class="stat">오늘 플레이한 기기<b>'+(per[days[6]]||0)+'</b></div><div class="stat">최근 7일 플레이한 기기<b>'+uniq.size+'</b></div><div class="stat">지금까지 플레이한 기기<b>'+devices+'</b></div><div class="stat">아이디를 만든 마을<b>'+villages+'</b></div><div class="stat">자랑 게시물(지우기 전)<b>'+boast+'</b></div></div>'+
-    '<div class="card" style="margin-top:12px"><b>최근 7일, 날마다 플레이한 기기 수</b><div class="bars">'+days.map(d=>'<div class="bar"><span>'+(per[d]||0)+'</span><i style="height:'+Math.round((per[d]||0)/max*100)+'%"></i><span>'+(+d.slice(4,6))+'/'+(+d.slice(6))+'</span></div>').join("")+'</div></div>'}
+  const max=Math.max(1,...per.map(v=>v||0));
+  $("info").textContent="숫자는 기기(브라우저) 기준이에요. 같은 아이가 다른 기기에서 하면 따로 세져요. 개수만 세서 한 번 열 때 서버 읽기가 10번 정도예요.";
+  $("list").innerHTML='<div class="stats"><div class="stat">오늘 플레이한 기기<b>'+per[6]+'</b></div><div class="stat">최근 7일 플레이 (날마다 더한 수)<b>'+sum+'</b></div><div class="stat">지금까지 플레이한 기기<b>'+devices+'</b></div><div class="stat">아이디를 만든 마을<b>'+villages+'</b></div><div class="stat">자랑 게시물(지우기 전)<b>'+boast+'</b></div></div>'+
+    '<div class="card" style="margin-top:12px"><b>최근 7일, 날마다 플레이한 기기 수</b><div class="bars">'+days.map((d,k)=>'<div class="bar"><span>'+per[k]+'</span><i style="height:'+Math.round((per[k]||0)/max*100)+'%"></i><span>'+(+d.slice(4,6))+'/'+(+d.slice(6))+'</span></div>').join("")+'</div></div>'}
 async function show(){$("list").innerHTML='<p class="fine">불러오는 중…</p>';
-  try{if(tab==="stat"){await stats();return}if(tab==="boast"){const q=await db.collection("boast").orderBy("at","desc").limit(200).get();const now=Date.now();
-      $("info").textContent="자랑 "+q.size+"개 (7일이 지나면 게임에서 안 보이고, 14일이 지나면 지워져요)";
-      $("list").innerHTML='<div class="grid">'+q.docs.map(d=>{const p=d.data(),age=Math.floor((now-p.at)/DAY);return '<div class="post'+(p.hidden?" hid":"")+'"><img src="'+(p.thumb||p.img||"")+'" alt=""><div class="m"><b>'+esc(p.school)+' '+esc(p.year)+'학년 · '+esc(p.nick)+'</b><span>'+(p.texts||[]).map(t=>PH[t]||t).join(" · ")+'</span><span class="fine">'+age+'일 전'+(p.hidden?" · 숨김":"")+'</span></div><div class="row"><button class="ghost" data-h="'+d.id+'" data-v="'+(p.hidden?0:1)+'">'+(p.hidden?"다시 보이기":"숨기기")+'</button><button class="warn" data-d="'+d.id+'">지우기</button></div></div>'}).join("")+'</div>';
+  try{if(tab==="stat"){await stats();return}if(tab==="boast"){const now=Date.now(),seen=bSeen();
+      const q=bmode==="new"?await db.collection("boast").where("at",">",seen).orderBy("at","desc").limit(100).get():await db.collection("boast").orderBy("at","desc").limit(blim).get();
+      const docs=q.docs,top=docs.length?Math.max(...docs.map(d=>d.data().at||0)):0;
+      $("info").textContent=bmode==="new"?(seen?"마지막으로 확인한 뒤("+new Date(seen).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"numeric",minute:"2-digit"})+") 올라온 자랑만 보여요.":"처음이라 최근 자랑을 보여요. 다 보고 [✓ 다 확인했어요]를 누르면 다음부터 새 자랑만 보여요."):"지난 자랑 최근 "+docs.length+"개 (7일이 지나면 게임에서 안 보이고, 14일이 지나면 지워져요)";
+      const head=bmode==="new"?'<div class="card qtop" style="margin-bottom:10px"><b>'+(docs.length?'🆕 새 자랑 '+docs.length+'개':'새 자랑이 없어요 ✨')+'</b><div class="qbtns">'+(docs.length?'<button id="bdone">✓ 다 확인했어요</button>':'')+'<button class="ghost" id="bold">지난 자랑 보기 (최근 30개)</button></div></div>':
+        '<div class="card qtop" style="margin-bottom:10px"><b>지난 자랑 '+docs.length+'개</b><div class="qbtns"><button class="ghost" id="bnew">← 새 자랑만 보기</button></div></div>';
+      const more=bmode==="old"&&docs.length>=blim&&blim<200?'<p style="text-align:center"><button class="ghost" id="bmore">30개 더 보기</button></p>':'';
+      $("list").innerHTML=head+(docs.length?'<div class="grid">'+docs.map(d=>{const p=d.data(),age=Math.floor((now-p.at)/DAY);return '<div class="post'+(p.hidden?" hid":"")+'"><img src="'+(p.thumb||p.img||"")+'" alt=""><div class="m"><b>'+esc(p.school)+' '+esc(p.year)+'학년 · '+esc(p.nick)+'</b><span>'+(p.texts||[]).map(t=>PH[t]||t).join(" · ")+'</span><span class="fine">'+(age?age+'일 전':'오늘')+(p.hidden?" · 숨김":"")+'</span></div><div class="row"><button class="ghost" data-h="'+d.id+'" data-v="'+(p.hidden?0:1)+'">'+(p.hidden?"다시 보이기":"숨기기")+'</button><button class="warn" data-d="'+d.id+'">지우기</button></div></div>'}).join("")+'</div>':'')+more;
+      if($("bdone"))$("bdone").onclick=()=>{try{localStorage.setItem(BSK,String(Math.max(top,seen)))}catch(e){}show()};
+      if($("bold"))$("bold").onclick=()=>{bmode="old";blim=30;show()};
+      if($("bnew"))$("bnew").onclick=()=>{bmode="new";show()};
+      if($("bmore"))$("bmore").onclick=()=>{blim+=30;show()};
       $("list").querySelectorAll("[data-h]").forEach(b=>b.onclick=async()=>{await db.collection("boast").doc(b.dataset.h).update({hidden:b.dataset.v==="1"});show()});
       $("list").querySelectorAll("[data-d]").forEach(b=>b.onclick=async()=>{if(!confirm("이 자랑을 지울까요?"))return;await db.collection("boast").doc(b.dataset.d).delete();db.collection("boastimg").doc(b.dataset.d).delete().catch(()=>{});show()})}
     else{const q=await db.collection("feedback").limit(300).get();$("info").textContent="받은 이야기 "+q.size+"개";
